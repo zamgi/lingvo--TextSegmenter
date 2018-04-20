@@ -1,0 +1,4 @@
+/bin/*
+/obj/*
+/(logs)/*
+*.csproj.user

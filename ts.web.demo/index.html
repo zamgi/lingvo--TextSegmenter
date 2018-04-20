@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Text segmentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="Text segmentation; natural language processing; computational linguistics" />
+    <meta name="keywords"    content="Text segmentation; natural language processing; computational linguistics" />
+    <link rel="stylesheet" href="rc/css/style.css" type="text/css" media="all" />
+    <script type="text/javascript" src="rc/javascript/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="rc/javascript/main.js"></script>
+</head>
+<body class="default">
+    <noscript>
+        <div style="background-color: #F00; color: #FFF; text-align: center; padding: 10px;">This site requires JavaScript enabled in your browser.</div>
+    </noscript>
+    <div id="wrapper">
+        <div id="superMainWrapper">
+            <div id="mainWrapper" class="clearfix">
+                <div id="main" class="clearfix">
+                    <div id="mainPageContent">
+                        <h2 id="periodsHeader" class="h-head">
+                            <span>Text segmentation</span>
+                        </h2>
+
+                        <h2 class="main-header">
+                            <span id="textLength"></span>
+                            <span>Enter the text for segmentation:</span>
+                            <span style="position: absolute; right: 125px;">
+                                <span style="color: dimgrey;">language:</span>
+                                <select id="lang" title="language">
+                                    <option value="any">ru, en</option>
+                                    <option value="ru">ru</option>
+                                    <option value="en">en</option>
+                                </select>
+                            </span>
+                            <span id="resetText2Default" title="reset text to default">x</span>
+                        </h2>
+
+                        <center>
+                            <textarea id="text" cols="100" rows="20"></textarea>
+                        </center>
+                        <div class="page-box-button">
+                            <input id="processButton" class="form-button" value="Process" type="submit" />
+                        </div>
+                        <h3 class="result-info" style="display:none"></h3>
+
+                        <div id="processResult" style="margin-top: 20px;">
+                            <table>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="footer" class="clearfix">
+                <div id="footerMenu">
+                    <span>&copy; 2018</span>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
