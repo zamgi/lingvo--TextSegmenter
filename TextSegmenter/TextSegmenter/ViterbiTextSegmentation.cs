@@ -102,15 +102,6 @@ namespace lingvo.ts
     /// </summary>
     internal sealed class ViterbiTextSegmentation_Offset
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private struct offset
-        {
-            public int startIndex;
-            public int length;
-        }
-
         private IModel _Model;
 
         public ViterbiTextSegmentation_Offset( IModel model )
