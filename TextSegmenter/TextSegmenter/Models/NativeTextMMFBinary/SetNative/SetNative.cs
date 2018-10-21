@@ -20,7 +20,7 @@ namespace lingvo.ts
         /// <summary>
         /// 
         /// </summary>
-		internal struct Slot
+        internal struct Slot
         {
             internal int    HashCode;
             internal int    Next;
@@ -37,18 +37,18 @@ namespace lingvo.ts
 
         public int Count { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => _Count; }
 
-		[TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
-		public SetNative() : this( DEFAULT_CAPACITY )
-		{
-		}
-		public SetNative( int capacity ) 
-		{
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
+        public SetNative() : this( DEFAULT_CAPACITY )
+        {
+        }
+        public SetNative( int capacity ) 
+        {
             var capacityPrime = PrimeHelper.GetPrime( capacity );
 
             _Buckets  = new int [ capacityPrime ];
-			_Slots    = new Slot[ capacityPrime ];
-			_FreeList = -1;
-		}
+            _Slots    = new Slot[ capacityPrime ];
+            _FreeList = -1;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Add( IntPtr value ) => (!Find( value, true ));
@@ -58,37 +58,37 @@ namespace lingvo.ts
         public bool Contains( IntPtr value ) => Find( value, false );
 
         public bool Remove( IntPtr value )
-		{
+        {
             int hash   = InternalGetHashCode( value );
-			int bucket = hash % _Buckets.Length;
-			int last   = -1;
+            int bucket = hash % _Buckets.Length;
+            int last   = -1;
             for ( int i = _Buckets[ bucket ] - 1; 0 <= i; )
-			{
+            {
                 ref var slot = ref _Slots[ i ];
                 if ( (slot.HashCode == hash) && _Comparer.Equals( slot.Value, value ) )
-				{
+                {
                     if ( last < 0 )
-					{
+                    {
                         _Buckets[ bucket ] = slot.Next + 1; 
                     }
-					else
-					{
+                    else
+                    {
                         _Slots[ last ].Next = slot.Next; 
-					}
+                    }
                     _Slots[ i ] = new Slot()
                     {
                         HashCode = -1,
                         Value    = IntPtr.Zero,
                         Next     = _FreeList,
                     };
-					_FreeList = i;
-					return (true);
-				}
-				last = i;
+                    _FreeList = i;
+                    return (true);
+                }
+                last = i;
                 i = slot.Next;
-			}
-			return (false);
-		}
+            }
+            return (false);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue( IntPtr value, out IntPtr existsValue )
@@ -130,7 +130,7 @@ namespace lingvo.ts
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool Find( IntPtr value, bool add )
-		{
+        {
             int hash = InternalGetHashCode( value );
             for ( int i = _Buckets[ hash % _Buckets.Length ] - 1; 0 <= i; )
             {
@@ -170,12 +170,12 @@ namespace lingvo.ts
                 _Buckets[ bucket ] = index + 1;
             }
 
-			return (false);
-		}
+            return (false);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Resize()
-		{
+        {
             int newSize = PrimeHelper.ExpandPrime4Size( _Count );
             int[]  newBuckets = new int[ newSize ];
             Slot[] newSlots   = new Slot[ newSize ];
@@ -189,10 +189,10 @@ namespace lingvo.ts
             }
             _Buckets = newBuckets;
             _Slots   = newSlots;
-		}
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private int InternalGetHashCode( IntPtr value ) => (_Comparer.GetHashCode( value ) & 0x7FFFFFFF);
+        private int InternalGetHashCode( IntPtr value ) => (_Comparer.GetHashCode( value ) & 0x7FFFFFFF);
 
         public IEnumerator< IntPtr > GetEnumerator() => new Enumerator( this );
         IEnumerator IEnumerable.GetEnumerator() => new Enumerator( this );
