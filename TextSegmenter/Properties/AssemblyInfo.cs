@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("TextSegmenter")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("xz")]
+[assembly: AssemblyCompany("zamgi")]
 [assembly: AssemblyProduct("TextSegmenter")]
-[assembly: AssemblyCopyright("Copyright © xz 2018")]
+[assembly: AssemblyCopyright("Copyright © zamgi 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
