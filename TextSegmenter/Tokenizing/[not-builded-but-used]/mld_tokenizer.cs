@@ -187,10 +187,7 @@ namespace lingvo.tokenizing
             Run( text, _AddWordToListAction );
             return (_Words);
         }
-        private void AddWordToList( string word )
-        {
-            _Words.Add( word );
-        }
+        private void AddWordToList( string word ) => _Words.Add( word );
 
         unsafe public void Run( string text, Action< string > processWordAction )
         {
@@ -354,22 +351,6 @@ namespace lingvo.tokenizing
 
             return (true);
         }
-        /*unsafe private bool SkipIfItUrl()
-        {
-            var url = _UrlDetector.AllocateSingleUrl( _Ptr );
-            if ( url != null )
-            {
-#if DEBUG
-var xxx = new string ( _BASE, url.startIndex, url.length );
-#endif
-                _Ptr = _BASE + url.startIndex + url.length - 1;
-                _StartIndex = (int)(_Ptr - _BASE + 1);
-                _Length = 0;
-                return (true);
-            }
-            return (false);
-        }
-        */
 
         private void CreateWordAndPutToList()
         {
@@ -498,18 +479,15 @@ var xxx = new string ( _BASE, url.startIndex, url.length );
                 {
                     hs.Add( ngram );
                 }
-                ngrams = null;
             }
-            terms = null;
         }
 		
         private IEnumerable< string > GetNGrams_2( IList< string > terms )
         {
-            var t1 = default(string);
-            var t2 = default(string);
             for ( int i = 0, len = terms.Count - 1; i < len; i++ )
             {
-                while (true)
+                string t1;
+                while ( true )
                 {
                     t1 = terms[ i ];
                     if ( t1 != null )
@@ -519,7 +497,8 @@ var xxx = new string ( _BASE, url.startIndex, url.length );
                         yield break;
                 }
 
-                while (true)
+                string t2;
+                while ( true )
                 {
                     t2 = terms[ i + 1 ];
                     if ( t2 != null )
@@ -535,12 +514,10 @@ var xxx = new string ( _BASE, url.startIndex, url.length );
         }
         private IEnumerable< string > GetNGrams_3( IList< string > terms )
         {
-            var t1 = default(string);
-            var t2 = default(string);
-            var t3 = default(string);
             for ( int i = 0, len = terms.Count - 2; i < len; i++ )
             {
-                while (true)
+                string t1;
+                while ( true )
                 {
                     t1 = terms[ i ];
                     if ( t1 != null )
@@ -550,7 +527,8 @@ var xxx = new string ( _BASE, url.startIndex, url.length );
                         yield break;
                 }
 
-                while (true)
+                string t2;
+                while ( true )
                 {
                     t2 = terms[ i + 1 ];
                     if ( t2 != null )
@@ -560,7 +538,8 @@ var xxx = new string ( _BASE, url.startIndex, url.length );
                         yield break;
                 }
 
-                while (true)
+                string t3;
+                while ( true )
                 {
                     t3 = terms[ i + 2 ];
                     if ( t3 != null )
@@ -576,13 +555,10 @@ var xxx = new string ( _BASE, url.startIndex, url.length );
         }
         private IEnumerable< string > GetNGrams_4( IList< string > terms )
         {
-            var t1 = default(string);
-            var t2 = default(string);
-            var t3 = default(string);
-            var t4 = default(string);
             for ( int i = 0, len = terms.Count - 3; i < len; i++ )
             {
-                while (true)
+                string t1;
+                while ( true )
                 {
                     t1 = terms[ i ];
                     if ( t1 != null )
@@ -592,7 +568,8 @@ var xxx = new string ( _BASE, url.startIndex, url.length );
                         yield break;
                 }
 
-                while (true)
+                string t2;
+                while ( true )
                 {
                     t2 = terms[ i + 1 ];
                     if ( t2 != null )
@@ -602,7 +579,8 @@ var xxx = new string ( _BASE, url.startIndex, url.length );
                         yield break;
                 }
 
-                while (true)
+                string t3;
+                while ( true )
                 {
                     t3 = terms[ i + 2 ];
                     if ( t3 != null )
@@ -612,7 +590,8 @@ var xxx = new string ( _BASE, url.startIndex, url.length );
                         yield break;
                 }
 
-                while (true)
+                string t4;
+                while ( true )
                 {
                     t4 = terms[ i + 3 ];
                     if ( t4 != null )

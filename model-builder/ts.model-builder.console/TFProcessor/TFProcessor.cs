@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.core.algorithm
 {
@@ -30,7 +32,7 @@ namespace lingvo.core.algorithm
     /// </summary>
     internal sealed class TermFrequencyComparer : IComparer<TermFrequency>
     {
-        public static readonly TermFrequencyComparer Instance = new TermFrequencyComparer();
+        public static TermFrequencyComparer Instance { get; } = new TermFrequencyComparer();
         private TermFrequencyComparer() { }
 
         public int Compare( TermFrequency x, TermFrequency y )
@@ -108,7 +110,7 @@ namespace lingvo.core.algorithm
         public int TotalWordCount => _TotalWordCount;
         public int DictionarySize => _TermFrequency.Count;
 
-        [ MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public void AddTerm( string term )
         {
             _TermFrequency.AddOrUpdate( term );
@@ -116,10 +118,10 @@ namespace lingvo.core.algorithm
         }
 
         #region [.begin-end add terms.]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public void BeginAddDocumentTerms() { }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public void AddDocumentTerms( Dictionary< string, int > dict )
         {
             foreach ( var p in dict )
@@ -128,7 +130,7 @@ namespace lingvo.core.algorithm
             }            
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public void AddDocumentTerms( SortedSet< TermFrequency > ss )
         {
             foreach ( var tf in ss )
@@ -137,7 +139,7 @@ namespace lingvo.core.algorithm
             }      
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public void EndAddDocumentTerms( int documentWordCount ) => _TotalWordCount += documentWordCount;
         #endregion
 
@@ -274,7 +276,7 @@ namespace lingvo.core.algorithm
     /// </summary>
     internal static class Extensions
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public static void AddOrUpdate( this Dictionary< string, int > dict, string key )
         {
             if ( dict.TryGetValue( key, out var count ) )
@@ -287,7 +289,7 @@ namespace lingvo.core.algorithm
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public static void AddOrUpdate( this Dictionary< string, int > dict, string key, int countValue )
         {
             if ( dict.TryGetValue( key, out var count ) )
@@ -300,7 +302,7 @@ namespace lingvo.core.algorithm
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public static void Append( this Dictionary< string, int > dict, IList< string > words )
         {
             foreach ( var word in words )
@@ -309,7 +311,7 @@ namespace lingvo.core.algorithm
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public static void AppendDictionary( this Dictionary< string, int > masterDict, Dictionary< string, int > slaveDict )
         {
             foreach ( var p in slaveDict )

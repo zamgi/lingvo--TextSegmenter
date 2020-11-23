@@ -4,13 +4,15 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
 using lingvo.core.algorithm;
 using lingvo.tokenizing;
 using lingvo.urls;
+
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.ts.modelbuilder
 {
@@ -61,10 +63,7 @@ namespace lingvo.ts.modelbuilder
                 _Line = _Sr.ReadLine();
             }
 
-            public void Dispose()
-            {
-                _Sr.Dispose();
-            }
+            public void Dispose() => _Sr.Dispose();
 
             public TermFrequency ReadNext()
             {
@@ -89,47 +88,32 @@ namespace lingvo.ts.modelbuilder
         {
             public tuple( TermFrequency _tf, ngram_filereader _ngram_filereader )
             {
-                tf             = _tf;
+                tf               = _tf;
                 ngram_filereader = _ngram_filereader;
             }
 
-            public TermFrequency tf
-            {
-                get;
-                set;
-            }
-            public ngram_filereader ngram_filereader
-            {
-                get;
-                private set;
-            }
+            public TermFrequency tf { get; set; }
+            public ngram_filereader ngram_filereader { get; private set; }
 
-            public void Dispose()
-            {
-                ngram_filereader.Dispose();
-            }
+            public void Dispose() => ngram_filereader.Dispose();
         }
         /// <summary>
         /// 
         /// </summary>
         private sealed class tuple_tf_term_Comparer : IComparer< tuple >
         {
-            public static readonly tuple_tf_term_Comparer Instance = new tuple_tf_term_Comparer();
+            public static tuple_tf_term_Comparer Instance { get; } = new tuple_tf_term_Comparer();
             private tuple_tf_term_Comparer() { }
-
-            #region [.IComparer< tuple_t >.]
             public int Compare( tuple x, tuple y ) => string.CompareOrdinal( x.tf.Term, y.tf.Term );
-            #endregion
         }
         /// <summary>
         /// 
         /// </summary>
         private sealed class tuple_tf_frequency_Comparer : IComparer< tuple >
         {
-            public static readonly tuple_tf_frequency_Comparer Instance = new tuple_tf_frequency_Comparer();
+            public static tuple_tf_frequency_Comparer Instance { get; } = new tuple_tf_frequency_Comparer();
             private tuple_tf_frequency_Comparer() { }
 
-            #region [.IComparer< tuple_t >.]
             public int Compare( tuple x, tuple y )
             {
                 var d = y.tf.Frequency - x.tf.Frequency;            
@@ -138,24 +122,18 @@ namespace lingvo.ts.modelbuilder
 
                 return (string.CompareOrdinal( y.tf.Term, x.tf.Term ));
             }
-            #endregion
         }
         /// <summary>
         /// 
         /// </summary>
         private sealed class stringComparer : IComparer< string >, IEqualityComparer< string >
         {
-            public static readonly stringComparer Instance = new stringComparer();
+            public static stringComparer Instance { get; } = new stringComparer();
             private stringComparer() { }
 
-            #region [.IComparer< string >.]
             public int Compare( string x, string y ) => string.CompareOrdinal( x, y );
-            #endregion
-
-            #region [.IEqualityComparer< string >.]
             public bool Equals( string x, string y ) => (string.CompareOrdinal( x, y ) == 0);
             public int GetHashCode( string obj ) => obj.GetHashCode();
-            #endregion
         }
 
         #region [.field's.]        
@@ -215,7 +193,7 @@ namespace lingvo.ts.modelbuilder
         }
         #endregion
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private void ProcessWordAction( string word )
         {
             if ( _Bp.SingleWordMaxLength < word.Length )
@@ -240,12 +218,12 @@ namespace lingvo.ts.modelbuilder
                     if ( _Word_prev3 != null )
                     {
                         _DocumentNgrams_4.AddOrUpdate( _Sb.Clear()
-                                                            .Append( _Word_prev3 ).Append( ' ' )
-                                                            .Append( _Word_prev2 ).Append( ' ' )
-                                                            .Append( _Word_prev1 ).Append( ' ' )
-                                                            .Append( word )
-                                                            .ToString() 
-                                                        );                        
+                                                          .Append( _Word_prev3 ).Append( ' ' )
+                                                          .Append( _Word_prev2 ).Append( ' ' )
+                                                          .Append( _Word_prev1 ).Append( ' ' )
+                                                          .Append( word )
+                                                          .ToString() 
+                                                     );                        
                     }
                     _Word_prev3 = _Word_prev2;
                 goto case NGramsEnum.ngram_3;
@@ -255,11 +233,11 @@ namespace lingvo.ts.modelbuilder
                     if ( _Word_prev2 != null )
                     {
                         _DocumentNgrams_3.AddOrUpdate( _Sb.Clear()
-                                                            .Append( _Word_prev2 ).Append( ' ' )
-                                                            .Append( _Word_prev1 ).Append( ' ' )
-                                                            .Append( word )
-                                                            .ToString() 
-                                                        );                        
+                                                          .Append( _Word_prev2 ).Append( ' ' )
+                                                          .Append( _Word_prev1 ).Append( ' ' )
+                                                          .Append( word )
+                                                          .ToString() 
+                                                     );                        
                     }
                     _Word_prev2 = _Word_prev1;
                 goto case NGramsEnum.ngram_2;
@@ -269,17 +247,17 @@ namespace lingvo.ts.modelbuilder
                     if ( _Word_prev1 != null )
                     {
                         _DocumentNgrams_2.AddOrUpdate( _Sb.Clear()
-                                                            .Append( _Word_prev1 ).Append( ' ' )
-                                                            .Append( word )
-                                                            .ToString() 
-                                                        );                        
+                                                          .Append( _Word_prev1 ).Append( ' ' )
+                                                          .Append( word )
+                                                          .ToString() 
+                                                     );                        
                     }
                     _Word_prev1 = word;
                 break;
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private void ProcessWordActionClearDigitsChars( string word )
         {
             if ( _Bp.SingleWordMaxLength < word.Length )
@@ -348,7 +326,7 @@ namespace lingvo.ts.modelbuilder
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private void ProcessWordActionClearCyrillicsChars( string word )
         {
             if ( word.HasCyrillicsChars() )
@@ -416,7 +394,7 @@ namespace lingvo.ts.modelbuilder
                 break;
             }
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private void ProcessWordActionClearCyrillicsAndDigitsChars( string word )
         {
             if ( word.HasCyrillicsOrDigitsChars() )
@@ -505,7 +483,7 @@ namespace lingvo.ts.modelbuilder
         }
 
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private void CheckPortion( Dictionary< string, int > dict, NGramsEnum ngram )
         {
             if ( _Bp.MaxPortionSize <= dict.Count )
@@ -517,7 +495,7 @@ namespace lingvo.ts.modelbuilder
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private void CheckLastPortion( Dictionary< string, int > dict, NGramsEnum ngram )
         {
             if ( dict.Count != 0 )
@@ -1099,7 +1077,7 @@ namespace lingvo.ts.modelbuilder
     /// </summary>
     internal static class Extensions
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         unsafe public static bool HasCyrillicsChars( this string value )
         {
             fixed ( char* _base = value )
@@ -1123,7 +1101,7 @@ namespace lingvo.ts.modelbuilder
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         unsafe public static bool HasDigitsChars( this string value )
         {
             fixed ( char* _base = value )
@@ -1144,7 +1122,7 @@ namespace lingvo.ts.modelbuilder
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         unsafe public static bool HasCyrillicsOrDigitsChars( this string value )
         {
             fixed ( char* _base = value )
