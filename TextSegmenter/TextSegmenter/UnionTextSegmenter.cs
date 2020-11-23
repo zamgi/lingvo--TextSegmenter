@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using lingvo.core;
-
 namespace lingvo.ts
 {
     /// <summary>
@@ -73,7 +71,7 @@ namespace lingvo.ts
 
             for ( var i = 0; i < ps.Length; i++ )
             {
-                ref var p = ref ps[ i ];
+                ref readonly var p = ref ps[ i ];
                 var m = new NativeTextMMFModelBinary( p.ModelConfigs );
                 _NativeTextMMFModelsBinary[ i ] = m;
                 _TextSegmenters           [ i ] = new TextSegmenter( m );
@@ -90,7 +88,7 @@ namespace lingvo.ts
 
             for ( var i = 0; i < ps.Length; i++ )
             {
-                ref var p = ref ps[ i ];
+                ref readonly var p = ref ps[ i ];
                 _TextSegmenters[ i ] = new TextSegmenter( p.Model );
                 _Languages     [ i ] = p.Language;
             }
@@ -129,24 +127,17 @@ namespace lingvo.ts
                     return (_TextSegmenters[ i ]);
                 }
             }
-            return (null);
+
+            throw (new ArgumentException( $"Language not found: '{lang}'" ));
         }
         public IReadOnlyList< TermProbability > Run( string text, LanguageEnum lang )
         {
             var ts = GetByLanguage( lang );
-            if ( ts == null )
-            {
-                throw (new ArgumentException( $"Language not found: '{lang}'" ));
-            }
             return (ts.Run( text ));
         }
         public IReadOnlyList< TermProbability_Offset > Run_Offset( string text, LanguageEnum lang )
         {
             var ts = GetByLanguage( lang );
-            if ( ts == null )
-            {
-                throw (new ArgumentException( $"Language not found: '{lang}'" ));
-            }
             return (ts.Run_Offset( text ));
         }
 
@@ -157,7 +148,7 @@ namespace lingvo.ts
             for ( var i = _TextSegmenters.Length - 1; 0 <= i; i-- )
             {
                 var tps  = _TextSegmenters[ i ].Run( text );
-                var prob = tps.Sum( tp => Math.Log( tp.Probability ) );
+                var prob = N( tps.Sum( tp => Math.Log( tp.Probability ) ) );
                 if ( bestProb < prob )
                 {
                     bestProb   = prob;
@@ -173,7 +164,7 @@ namespace lingvo.ts
             for ( var i = _TextSegmenters.Length - 1; 0 <= i; i-- )
             {
                 var tps  = _TextSegmenters[ i ].Run_Offset( text );
-                var prob = tps.Sum( tp => Math.Log( tp.Probability ) );
+                var prob = N( tps.Sum( tp => Math.Log( tp.Probability ) ) );
                 if ( bestProb < prob )
                 {
                     bestProb   = prob;
@@ -182,5 +173,41 @@ namespace lingvo.ts
             }
             return (bestResult);
         }
+
+        public IReadOnlyCollection< (Result r, double prob) > Run4All( string text )
+        {
+            var res = new (Result r, double prob)[ _TextSegmenters.Length ];
+
+            for ( var i = _TextSegmenters.Length - 1; 0 <= i; i-- )
+            {
+                var tps    = _TextSegmenters[ i ].Run( text );
+                var result = Result.Create( tps, _Languages[ i ] );
+                var prob   = N( tps.Sum( tp => Math.Log( tp.Probability ) ) );
+
+                res[ i ] = (result, prob);
+            }
+
+            PutToInterval( res );
+
+            return (res);
+        }
+        private static void PutToInterval( (Result r, double prob)[] res )
+        {
+            double min = res.Min( t => t.prob );
+            double max = res.Max( t => t.prob );
+
+            double new_min = 0.01;
+            double new_max = 0.99;
+
+            double coef = (new_max - new_min) / (max - min); // коэффициент пересчёта
+
+            for ( var i = 0; i < res.Length; i++ )
+            {
+                ref var t = ref res[ i ];
+
+                t.prob = (t.prob - min) * coef + new_min;
+            }
+        }
+        private static double N( double d ) => (double.IsInfinity( d ) ? double.MinValue : d);
     }
 }

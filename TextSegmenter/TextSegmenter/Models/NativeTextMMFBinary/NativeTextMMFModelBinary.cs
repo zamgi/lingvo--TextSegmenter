@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 using lingvo.core;
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.ts
 {
@@ -29,14 +30,8 @@ namespace lingvo.ts
         #endregion        
 
         #region [.ctor().]
-        public NativeTextMMFModelBinary( BinaryModelConfig config )
-        {
-            _Set = LoadBinaryModel( config );
-        }
-        ~NativeTextMMFModelBinary()
-        {
-            DisposeNativeResources();
-        }
+        public NativeTextMMFModelBinary( BinaryModelConfig config ) => _Set = LoadBinaryModel( config );
+        ~NativeTextMMFModelBinary() => DisposeNativeResources();
 
         public void Dispose()
         {
@@ -130,7 +125,7 @@ namespace lingvo.ts
         #endregion
 
         #region [.IModel.]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         unsafe private static double ToProbability( IntPtr baseIntPtr, int offset )
         {
             var probabilityPtr = ((byte*) baseIntPtr) + sizeof(char) * offset;
@@ -138,7 +133,7 @@ namespace lingvo.ts
             return (probability);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private static void ToModelRecord( IntPtr baseIntPtr, out ModelRecord m )
         {
             var s = StringsHelper.ToString( baseIntPtr );
@@ -182,9 +177,9 @@ namespace lingvo.ts
             probability = default(double);
             return (false);
         }
-        public bool TryGetProbability( ref NativeOffset no, out double probability )
+        public bool TryGetProbability( in NativeOffset no, out double probability )
         {
-            if ( _Set.TryGetValue( ref no, out var existsValue ) )
+            if ( _Set.TryGetValue( in no, out var existsValue ) )
             {
 #if DEBUG
                 var len = StringsHelper.GetLength( existsValue );

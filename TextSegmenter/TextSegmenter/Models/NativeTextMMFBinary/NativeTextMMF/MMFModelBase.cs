@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
 using lingvo.core;
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.ts
 {
@@ -75,10 +76,7 @@ namespace lingvo.ts
                 }
                 _EndBuffer = _Buffer + length;
             }
-            ~EnumeratorMMF()
-            {
-                DisposeNativeResources();
-            }
+            ~EnumeratorMMF() => DisposeNativeResources();
 
             public void Dispose()
             {
@@ -226,11 +224,7 @@ namespace lingvo.ts
 
 
         protected static CharType* _CTM;
-
-        static MMFModelBase()
-        {
-            _CTM = xlat_Unsafe.Inst._CHARTYPE_MAP;
-        }
+        static MMFModelBase() => _CTM = xlat_Unsafe.Inst._CHARTYPE_MAP;
     }
 
     /// <summary>
@@ -238,8 +232,7 @@ namespace lingvo.ts
     /// </summary>
     unsafe internal struct IntPtrEqualityComparer : IEqualityComparer< IntPtr >
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals( IntPtr x, IntPtr y )
+        [M(O.AggressiveInlining)] public bool Equals( IntPtr x, IntPtr y )
         {
             //--practically does not happen--// if ( x == y ) return (true);
 
@@ -253,9 +246,7 @@ namespace lingvo.ts
                     return (true);
             }
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetHashCode( IntPtr obj )
+        [M(O.AggressiveInlining)] public int GetHashCode( IntPtr obj )
         {
             char* ptr = (char*) obj;
             int n1 = 5381;
@@ -270,9 +261,7 @@ namespace lingvo.ts
             return (n1 + n2 * 1566083941);
         }            
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals( char* x, char* y, char* y_end )
+        [M(O.AggressiveInlining)] public bool Equals( char* x, char* y, char* y_end )
         {
             //--practically does not happen--// if ( x == y ) return (true);
 
@@ -286,8 +275,7 @@ namespace lingvo.ts
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetHashCode( ref NativeOffset no )
+        [M(O.AggressiveInlining)] public int GetHashCode( in NativeOffset no )
         {
             char* ptr    = no.BasePtr + no.StartIndex;
             char* endPtr = ptr + no.Length;

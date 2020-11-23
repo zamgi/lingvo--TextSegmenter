@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.core
 {
@@ -21,7 +23,7 @@ namespace lingvo.core
         /// <summary>
         /// 
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public static string ToUpperInvariant( string value )
         {
             var len = value.Length;
@@ -44,8 +46,7 @@ namespace lingvo.core
         /// <summary>
         /// 
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToUpperInvariant( string value, out bool isNullOrWhiteSpace )
+        [M(O.AggressiveInlining)] public static string ToUpperInvariant( string value, out bool isNullOrWhiteSpace )
         {
             isNullOrWhiteSpace = true;
             var len = value.Length;
@@ -69,8 +70,7 @@ namespace lingvo.core
             return (string.Empty);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void   ToUpperInvariant( char* wordFrom, char* bufferTo )
+        [M(O.AggressiveInlining)] public static void   ToUpperInvariant( char* wordFrom, char* bufferTo )
         {
             for ( ; ; wordFrom++, bufferTo++ )
             {
@@ -82,9 +82,7 @@ namespace lingvo.core
                 }
             }            
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void   ToUpperInvariantInPlace( string value )
+        [M(O.AggressiveInlining)] public static void   ToUpperInvariantInPlace( string value )
         {
             fixed ( char* value_ptr = value )
             {
@@ -92,8 +90,7 @@ namespace lingvo.core
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void   ToUpperInvariantInPlace( char* word )
+        [M(O.AggressiveInlining)] public static void   ToUpperInvariantInPlace( char* word )
         {
             for ( ; ; word++ )
             {
@@ -105,9 +102,7 @@ namespace lingvo.core
                 *word = *(_UPPER_INVARIANT_MAP + ch);
             }
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void   ToUpperInvariantInPlace( char* word, out bool isNullOrWhiteSpace )
+        [M(O.AggressiveInlining)] public static void   ToUpperInvariantInPlace( char* word, out bool isNullOrWhiteSpace )
         {
             isNullOrWhiteSpace = true;
             for ( ; ; word++ )
@@ -125,8 +120,7 @@ namespace lingvo.core
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void   ToUpperInvariantInPlace( char* word, int length )
+        [M(O.AggressiveInlining)] public static void   ToUpperInvariantInPlace( char* word, int length )
         {
             for ( length--; 0 <= length; length-- )
             {
@@ -134,14 +128,11 @@ namespace lingvo.core
             }
         }
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToLowerInvariant( string value ) => value.ToLowerInvariant();
+        [M(O.AggressiveInlining)] public static string ToLowerInvariant( string value ) => value.ToLowerInvariant();
 
 
         /// проверка эквивалентности строк
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEqual( string first, string second )
+        [M(O.AggressiveInlining)] public static bool IsEqual( string first, string second )
         {
             int length = first.Length;
             if ( length != second.Length )
@@ -166,9 +157,7 @@ namespace lingvo.core
             }
             return (true);
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEqual( string first, char* second_ptr, int secondLength )
+        [M(O.AggressiveInlining)] public static bool IsEqual( string first, char* second_ptr, int secondLength )
         {
             #region comm
             /*
@@ -196,9 +185,7 @@ namespace lingvo.core
             return (true);
         }
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEqual( string first, int firstIndex, string second )
+        [M(O.AggressiveInlining)] public static bool IsEqual( string first, int firstIndex, string second )
         {
             int length = first.Length - firstIndex;
             if ( length != second.Length )
@@ -224,9 +211,7 @@ namespace lingvo.core
             }
             return (true);
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEqual( string first, int firstIndex, char* second_ptr, int secondLength )
+        [M(O.AggressiveInlining)] public static bool IsEqual( string first, int firstIndex, char* second_ptr, int secondLength )
         {
             int length = first.Length - firstIndex;
             if ( length != secondLength )
@@ -252,9 +237,7 @@ namespace lingvo.core
             return (true);
         }
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEqual( IntPtr x, IntPtr y )
+        [M(O.AggressiveInlining)] public static bool IsEqual( IntPtr x, IntPtr y )
         {
             if ( x == y )
                 return (true);
@@ -270,9 +253,7 @@ namespace lingvo.core
                     return (true);
             }
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEqual( char* x, char* y )
+        [M(O.AggressiveInlining)] public static bool IsEqual( char* x, char* y )
         {
             if ( x == y )
                 return (true);
@@ -288,9 +269,7 @@ namespace lingvo.core
             }
         }
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetLength( char* _base )
+        [M(O.AggressiveInlining)] public static int GetLength( char* _base )
         {
             for ( var ptr = _base; ; ptr++ )
             {
@@ -300,13 +279,9 @@ namespace lingvo.core
                 }
             }
         }
+        [M(O.AggressiveInlining)] public static int GetLength( IntPtr _base ) => GetLength( (char*) _base );
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetLength( IntPtr _base ) => GetLength( (char*) _base );
-
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToString( char* value )
+        [M(O.AggressiveInlining)] public static string ToString( char* value )
         {
             if ( value == null )
             {
@@ -332,9 +307,7 @@ namespace lingvo.core
             }
             return (str);
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToString( char* value, int length )
+        [M(O.AggressiveInlining)] public static string ToString( char* value, int length )
         {
             if ( value == null )
             {
@@ -359,16 +332,10 @@ namespace lingvo.core
             }
             return (str);
         }
+        [M(O.AggressiveInlining)] public static string ToString( IntPtr value ) => ToString( (char*) value );
+        [M(O.AggressiveInlining)] public static string ToString( IntPtr value, int length ) => ToString( (char*) value, length );
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToString( IntPtr value ) => ToString( (char*) value );
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToString( IntPtr value, int length ) => ToString( (char*) value, length );
-
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IntPtr AllocHGlobalAndCopy( char* source, int sourceLength )
+        [M(O.AggressiveInlining)] public static IntPtr AllocHGlobalAndCopy( char* source, int sourceLength )
         {
             //alloc with include zero-'\0' end-of-string
             var destPtr = Marshal.AllocHGlobal( (sourceLength + 1) * sizeof(char) );
@@ -380,25 +347,17 @@ namespace lingvo.core
             *destination = '\0';
             return (destPtr);
         }
+        [M(O.AggressiveInlining)] public static IntPtr AllocHGlobalAndCopy( IntPtr source, int sourceLength ) => AllocHGlobalAndCopy( (char*) source, sourceLength );
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IntPtr AllocHGlobalAndCopy( IntPtr source, int sourceLength ) => AllocHGlobalAndCopy( (char*) source, sourceLength );
-
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasLetters( string value )
+        [M(O.AggressiveInlining)] public static bool HasLetters( string value )
         {
             fixed ( char* value_ptr = value )
             {
                 return (HasLetters( value_ptr ));
             }
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasLetters( IntPtr value ) => HasLetters( (char*) value );
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasLetters( char* value )
+        [M(O.AggressiveInlining)] public static bool HasLetters( IntPtr value ) => HasLetters( (char*) value );
+        [M(O.AggressiveInlining)] public static bool HasLetters( char* value )
         {
             if ( value == null )
             {
@@ -419,11 +378,8 @@ namespace lingvo.core
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsLetters( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsLetter) == CharType.IsLetter);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsDash( char ch )
+        [M(O.AggressiveInlining)] public static bool IsLetters( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsLetter) == CharType.IsLetter);
+        [M(O.AggressiveInlining)] public static bool IsDash( char ch )
         {
             switch ( ch )
             {
@@ -437,8 +393,6 @@ namespace lingvo.core
                     return (false);
             }
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsLettersOrDash( char ch ) => (IsLetters( ch ) || IsDash( ch ));
+        [M(O.AggressiveInlining)] public static bool IsLettersOrDash( char ch ) => (IsLetters( ch ) || IsDash( ch ));
     }
 }

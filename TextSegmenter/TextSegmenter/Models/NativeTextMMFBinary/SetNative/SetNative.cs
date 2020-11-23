@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime;
-using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
+
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.ts
 {
@@ -17,6 +19,7 @@ namespace lingvo.ts
 #endif
         sealed class SetNative : IEnumerable< IntPtr >
     {
+        private const string REASON = "Performance critical to inline this type of method across NGen image boundaries";
         /// <summary>
         /// 
         /// </summary>
@@ -35,26 +38,24 @@ namespace lingvo.ts
         private int    _FreeList;
         private IntPtrEqualityComparer _Comparer;
 
-        public int Count { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => _Count; }
+        public int Count { [M(O.AggressiveInlining)] get => _Count; }
 
-        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
-        public SetNative() : this( DEFAULT_CAPACITY )
-        {
-        }
+        [TargetedPatchingOptOut(REASON)]
+        public SetNative() : this( DEFAULT_CAPACITY ) { }
         public SetNative( int capacity ) 
         {
-            var capacityPrime = PrimeHelper.GetPrime( capacity );
+            var capacityPrime = PrimeHelper.GetPrime_v2( capacity );
 
             _Buckets  = new int [ capacityPrime ];
             _Slots    = new Slot[ capacityPrime ];
             _FreeList = -1;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public bool Add( IntPtr value ) => (!Find( value, true ));
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]        
+        [M(O.AggressiveInlining)]
+        [TargetedPatchingOptOut(REASON)]        
         public bool Contains( IntPtr value ) => Find( value, false );
 
         public bool Remove( IntPtr value )
@@ -64,7 +65,7 @@ namespace lingvo.ts
             int last   = -1;
             for ( int i = _Buckets[ bucket ] - 1; 0 <= i; )
             {
-                ref var slot = ref _Slots[ i ];
+                ref readonly var slot = ref _Slots[ i ];
                 if ( (slot.HashCode == hash) && _Comparer.Equals( slot.Value, value ) )
                 {
                     if ( last < 0 )
@@ -82,6 +83,7 @@ namespace lingvo.ts
                         Next     = _FreeList,
                     };
                     _FreeList = i;
+                    _Count--;
                     return (true);
                 }
                 last = i;
@@ -90,13 +92,13 @@ namespace lingvo.ts
             return (false);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         public bool TryGetValue( IntPtr value, out IntPtr existsValue )
         {
             int hash = InternalGetHashCode( value );
             for ( int i = _Buckets[ hash % _Buckets.Length ] - 1; 0 <= i; )
             {
-                ref var slot = ref _Slots[ i ];
+                ref readonly var slot = ref _Slots[ i ];
                 if ( (slot.HashCode == hash) && _Comparer.Equals( slot.Value, value ) )
                 {
                     existsValue = slot.Value;
@@ -108,15 +110,15 @@ namespace lingvo.ts
             return (false);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe public bool TryGetValue( ref NativeOffset no, out IntPtr existsValue )
+        [M(O.AggressiveInlining)]
+        unsafe public bool TryGetValue( in NativeOffset no, out IntPtr existsValue )
         {
-            int hash = (_Comparer.GetHashCode( ref no ) & 0x7FFFFFFF);
+            int hash = (_Comparer.GetHashCode( in no ) & 0x7FFFFFFF);
             var start_ptr = no.BasePtr + no.StartIndex;
             var end_ptr   = start_ptr + no.Length;
             for ( int i = _Buckets[ hash % _Buckets.Length ] - 1; 0 <= i; )
             {
-                ref var slot = ref _Slots[ i ];
+                ref readonly var slot = ref _Slots[ i ];
                 if ( (slot.HashCode == hash) && _Comparer.Equals( (char*) slot.Value, start_ptr, end_ptr ) )
                 {
                     existsValue = slot.Value;
@@ -128,13 +130,13 @@ namespace lingvo.ts
             return (false);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private bool Find( IntPtr value, bool add )
         {
             int hash = InternalGetHashCode( value );
             for ( int i = _Buckets[ hash % _Buckets.Length ] - 1; 0 <= i; )
             {
-                ref var slot = ref _Slots[ i ];
+                ref readonly var slot = ref _Slots[ i ];
                 if ( (slot.HashCode == hash) && _Comparer.Equals( slot.Value, value ) )
                 {
                     return (true);
@@ -148,7 +150,7 @@ namespace lingvo.ts
                 if ( 0 <= _FreeList )
                 {
                     index = _FreeList;
-                    ref var slot = ref _Slots[ index ];
+                    ref readonly var slot = ref _Slots[ index ];
                     _FreeList = slot.Next;
                 }
                 else
@@ -173,7 +175,7 @@ namespace lingvo.ts
             return (false);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private void Resize()
         {
             int newSize = PrimeHelper.ExpandPrime4Size( _Count );
@@ -191,7 +193,7 @@ namespace lingvo.ts
             _Slots   = newSlots;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [M(O.AggressiveInlining)]
         private int InternalGetHashCode( IntPtr value ) => (_Comparer.GetHashCode( value ) & 0x7FFFFFFF);
 
         public IEnumerator< IntPtr > GetEnumerator() => new Enumerator( this );
@@ -212,9 +214,7 @@ namespace lingvo.ts
                 _Index   = 0;
                 _Current = IntPtr.Zero;
             }
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public bool MoveNext()
             {
@@ -222,7 +222,7 @@ namespace lingvo.ts
                 // set.count+1 could be negative if dictionary.count is Int32.MaxValue
                 while ( (uint) _Index < (uint) _Set._Count )
                 {
-                    ref var slot = ref _Set._Slots[ _Index ];
+                    ref readonly var slot = ref _Set._Slots[ _Index ];
                     if ( 0 <= slot.HashCode )
                     {
                         _Current = slot.Value;
@@ -340,8 +340,7 @@ namespace lingvo.ts
             7199369
         };
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ExpandPrime4Size( int oldSize )
+        [M(O.AggressiveInlining)] public static int ExpandPrime4Size( int oldSize )
         {
             int newSize = oldSize << 1;
             if ( ((uint) newSize > (uint) 0x7feffffd) && ((int) 0x7feffffd > oldSize) )
@@ -351,12 +350,11 @@ namespace lingvo.ts
             return (GetPrime( newSize ));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        public static int GetPrime( int min )
+        [M(O.AggressiveInlining), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)] public static int GetPrime( int min )
         {
             if ( min < 0 )
             {
-                throw new ArgumentException( nameof(min) );
+                throw (new ArgumentException( nameof(min) ));
             }
 
             for ( int i = 0; i < _Primes.Length; i++ )
@@ -376,9 +374,32 @@ namespace lingvo.ts
             }
             return (min);
         }
+        [M(O.AggressiveInlining), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)] public static int GetPrime_v2( int min )
+        {
+            if ( min < 0 )
+            {
+                throw (new ArgumentException( nameof(min) ));
+            }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        public static bool IsPrime( int candidate )
+            /*for ( int i = 0; i < _Primes.Length; i++ )
+            {
+                int p = _Primes[ i ];
+                if ( min <= p )
+                {
+                    return (p);
+                }
+            }*/
+            for ( int j = min | 1; j < int.MaxValue; j += 2 )
+            {
+                if ( IsPrime( j ) && ((j - 1) % 101 != 0) )
+                {
+                    return (j);
+                }
+            }
+            return (min);
+        }
+
+        [M(O.AggressiveInlining), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)] public static bool IsPrime( int candidate )
         {
             if ( (candidate & 1) != 0 )
             {

@@ -35,7 +35,7 @@ namespace lingvo.ts
     public interface IModel : IDisposable
     {
         bool TryGetProbability( string ngram, out double probability );
-        bool TryGetProbability( ref NativeOffset no, out double probability );
+        bool TryGetProbability( in NativeOffset no, out double probability );
 
         IEnumerable< ModelRecord > GetAllRecords();
 

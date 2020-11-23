@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using lingvo.core;
-
 namespace lingvo.ts
 {
     /// <summary>
@@ -20,7 +18,6 @@ namespace lingvo.ts
         } 
 #endif
         private Dictionary< string, double > _Dictionary;
-
         public ManagedTextModel( TextModelConfig config )
         {
             config.ThrowIfNull( nameof(config) );
@@ -52,6 +49,6 @@ namespace lingvo.ts
         public int RecordCount => _Dictionary.Count;
 
         public bool TryGetProbability( string ngram, out double probability ) => _Dictionary.TryGetValue( ngram, out probability );
-        public bool TryGetProbability( ref NativeOffset no, out double probability ) => throw new NotImplementedException();
+        public bool TryGetProbability( in NativeOffset no, out double probability ) => throw new NotImplementedException();
     }
 }

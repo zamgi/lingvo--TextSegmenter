@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 using lingvo.core;
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.ts
 {
@@ -12,14 +13,9 @@ namespace lingvo.ts
     internal sealed class ViterbiTextSegmentation
     {
         private IModel _Model;
+        public ViterbiTextSegmentation( IModel model ) => _Model = model;
 
-        public ViterbiTextSegmentation( IModel model )
-        {
-            _Model = model;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private double GetWordProbability( string word )
+        [M(O.AggressiveInlining)] private double GetWordProbability( string word )
         {
             if ( (word.Length == 1) && !StringsHelper.IsLettersOrDash( word[ 0 ] ) )
             {
@@ -65,8 +61,7 @@ namespace lingvo.ts
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public List< TermProbability > Run( string text )
+        [M(O.AggressiveInlining)] public List< TermProbability > Run( string text )
         {
             var len   = text.Length;
             var probs = new double[ len + 1 ]; probs[ 0 ] = 1;
@@ -103,25 +98,19 @@ namespace lingvo.ts
     internal sealed class ViterbiTextSegmentation_Offset
     {
         private IModel _Model;
+        public ViterbiTextSegmentation_Offset( IModel model ) => _Model = model;
 
-        public ViterbiTextSegmentation_Offset( IModel model )
-        {
-            _Model = model;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe private double GetWordProbability( ref NativeOffset no )
+        [M(O.AggressiveInlining)] unsafe private double GetWordProbability( in NativeOffset no )
         {
             if ( (no.Length == 1) && !StringsHelper.IsLettersOrDash( no.BasePtr[ no.StartIndex ] ) )
             {
                 return (1);
             }
 
-            return (_Model.TryGetProbability( ref no, out var prob ) ? prob : 0);
+            return (_Model.TryGetProbability( in no, out var prob ) ? prob : 0);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe public List< TermProbability_Offset > Run( char* text, int length )
+        [M(O.AggressiveInlining)] unsafe public List< TermProbability_Offset > Run( char* text, int length )
         {
             var probs   = stackalloc double      [ length + 1 ]; probs[ 0 ] = 1;
             var offsets = stackalloc NativeOffset[ length + 1 ];
@@ -132,7 +121,7 @@ namespace lingvo.ts
                 {
                     no.StartIndex = j;
                     no.Length     = i - j;
-                    var term_prob = probs[ i - no.Length ] * GetWordProbability( ref no );
+                    var term_prob = probs[ i - no.Length ] * GetWordProbability( in no );
                     if ( probs[ i ] <= term_prob )
                     {
                         probs  [ i ] = term_prob;
@@ -150,7 +139,7 @@ namespace lingvo.ts
                     StartIndex  = no_ptr->StartIndex,
                     Length      = no_ptr->Length,
                     Probability = probs[ i ],
-                } );
+                });
                 i = i - no_ptr->Length;
             }
             tuples.Reverse();

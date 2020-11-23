@@ -79,7 +79,7 @@ namespace lingvo.ts.TestApp
     /// </summary>
     internal static class Program
     {
-        private static void Main( string[] args )
+        private static void Main()
         {
             #region [.GC.]
             GCSettings.LatencyMode = GCLatencyMode.LowLatency;
@@ -108,7 +108,7 @@ namespace lingvo.ts.TestApp
                 var count = model.RecordCount;
                 sw.Stop();
 
-                    GCCollect();
+                GCCollect();
                 Console.WriteLine( $"=> elapsed: {sw.Elapsed}, record-count: {count}\r\n" );
 
                 //*
@@ -130,7 +130,7 @@ namespace lingvo.ts.TestApp
                 var count = model.RecordCount;
                 sw.Stop();
 
-                    GCCollect();
+                GCCollect();
                 Console.WriteLine( $"=> elapsed: {sw.Elapsed}, record-count: {count}\r\n" );
 
                 //*
@@ -186,6 +186,13 @@ namespace lingvo.ts.TestApp
         }
         private static void Test__UnionTextSegmenter( UnionTextSegmenter uts )
         {
+            const string TXT = "анаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеон" +
+                               "анаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеон";
+
+            uts.RunToConsole( TXT );
+            uts.Run4All( TXT ).ToConsole();
+            uts.Run4All( "Textsegmentation" ).ToConsole();
+
             uts.RunToConsole( "Textsegmentation" );
             uts.RunToConsole( "азатемоформилвсёэтоввидебиблиотекинаC++соswigбиндингамидлядругихязыков" );
 
@@ -197,6 +204,7 @@ namespace lingvo.ts.TestApp
             uts.RunToConsole( "барсук" );
             uts.RunToConsole( "карамель" );
             uts.RunToConsole( "ебеммозгибезучетаконтекста" );
+            uts.RunToConsole( "наполеон" );
 
             //EN
             uts.RunToConsole( "Itiseasytoreadwordswithoutspaces" ); // => "It is easy to read words without spaces"
@@ -213,12 +221,16 @@ namespace lingvo.ts.TestApp
         private static void RunToConsole( this ITextSegmenter ts, string text )
         {
             Console.Write( $"'{text}' => " );
-            //ts.Run( text ).ToConsole();
+            ts.Run( text ).ToConsole();
+        }
+        private static void RunToConsole_Offset( this ITextSegmenter ts, string text )
+        {
+            Console.Write( $"'{text}' => " );
             ts.Run_Offset( text ).ToConsole( text );
         }
         private static void ToConsole( this IReadOnlyCollection< TermProbability > tps )
         {
-            if ( tps != null && tps.Any() )
+            if ( tps.AnyEx() )
             {
                 Console.WriteLine( '\'' + string.Join( " ", tps.Select( t => t.Term ) ) + '\'' );
             }
@@ -229,7 +241,7 @@ namespace lingvo.ts.TestApp
         }
         private static void ToConsole( this IReadOnlyCollection< TermProbability_Offset > tps, string text )
         {
-            if ( tps != null && tps.Any() )
+            if ( tps.AnyEx() )
             {
                 Console.WriteLine( '\'' + string.Join( " ", tps.Select( t => t.GetTerm( text ) ) ) + '\'' );
             }
@@ -243,11 +255,16 @@ namespace lingvo.ts.TestApp
         private static void RunToConsole( this UnionTextSegmenter uts, string text )
         {
             Console.Write( $"'{text}' => " );
+            uts.RunBest( text ).ToConsole();
+        }
+        private static void RunToConsole_Offset( this UnionTextSegmenter uts, string text )
+        {
+            Console.Write( $"'{text}' => " );
             uts.RunBest_Offset( text ).ToConsole( text );
         }
         private static void ToConsole( this _UResult_ r )
         {
-            if ( r.TPS != null && r.TPS.Any() )
+            if ( r.TPS.AnyEx() )
             {
                 Console.WriteLine( '\'' + string.Join( " ", r.TPS.Select( t => t.Term ) ) + $"' ({r.Language})" );
             }
@@ -256,9 +273,25 @@ namespace lingvo.ts.TestApp
                 Console.WriteLine( "EMPTY" ); 
             }
         }
+        private static void ToConsole( this IReadOnlyCollection< (_UResult_ r, double prop) > res )
+        {
+            if ( res.AnyEx() )
+            {
+                Console.WriteLine( "-------------------------------------" );
+                foreach ( var t in res )
+                {
+                    Console.WriteLine( '\'' + string.Join( " ", t.r.TPS.Select( tp => tp.Term ) ) + $"' ({t.r.Language})  {t.prop * 100:N2}%" );
+                }
+                Console.WriteLine( "-------------------------------------" );
+            }
+            else
+            {
+                Console.WriteLine( "EMPTY" );
+            }
+        }
         private static void ToConsole( this _UResultOffset_ r, string text )
         {
-            if ( r.TPS != null && r.TPS.Any() )
+            if ( r.TPS.AnyEx() )
             {
                 Console.WriteLine( '\'' + string.Join( " ", r.TPS.Select( t => t.GetTerm( text ) ) ) + $"' ({r.Language})" );
             }
@@ -267,5 +300,8 @@ namespace lingvo.ts.TestApp
                 Console.WriteLine( "EMPTY" ); 
             }
         }
+
+
+        private static bool AnyEx< T >( this IEnumerable< T > seq ) => ((seq != null) && seq.Any());
     }
 }
