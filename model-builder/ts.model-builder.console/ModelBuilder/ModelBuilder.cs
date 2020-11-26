@@ -193,13 +193,12 @@ namespace lingvo.ts.modelbuilder
         }
         #endregion
 
-        [M(O.AggressiveInlining)]
-        private void ProcessWordAction( string word )
+        [M(O.AggressiveInlining)] private void ProcessWordAction( string word )
         {
             if ( _Bp.SingleWordMaxLength < word.Length )
             {
 #if DEBUG
-                Console.Write( $"\r\nskip-by-len #{(++_SkipWordCount)}: '{word}'" );
+                Console.WriteLine( $"\r\nskip-by-len #{(++_SkipWordCount)}: '{word}'" );
 #endif
                 _Word_prev3 = _Word_prev2 = _Word_prev1 = null;
                 return;
@@ -257,13 +256,12 @@ namespace lingvo.ts.modelbuilder
             }
         }
 
-        [M(O.AggressiveInlining)]
-        private void ProcessWordActionClearDigitsChars( string word )
+        [M(O.AggressiveInlining)] private void ProcessWordActionClearDigitsChars( string word )
         {
             if ( _Bp.SingleWordMaxLength < word.Length )
             {
 #if DEBUG
-                Console.Write( $"\r\nskip-by-len #{(++_SkipWordCount)}: '{word}'" );
+                Console.WriteLine( $"\r\nskip-by-len #{(++_SkipWordCount)}: '{word}'" );
 #endif
                 _Word_prev3 = _Word_prev2 = _Word_prev1 = null;
                 return;
@@ -326,8 +324,7 @@ namespace lingvo.ts.modelbuilder
             }
         }
 
-        [M(O.AggressiveInlining)]
-        private void ProcessWordActionClearCyrillicsChars( string word )
+        [M(O.AggressiveInlining)] private void ProcessWordActionClearCyrillicsChars( string word )
         {
             if ( word.HasCyrillicsChars() )
             {
@@ -337,7 +334,7 @@ namespace lingvo.ts.modelbuilder
             if ( _Bp.SingleWordMaxLength < word.Length )
             {
 #if DEBUG
-                Console.Write( $"\r\nskip-by-len #{(++_SkipWordCount)}: '{word}'" );
+                Console.WriteLine( $"\r\nskip-by-len #{(++_SkipWordCount)}: '{word}'" );
 #endif
                 _Word_prev3 = _Word_prev2 = _Word_prev1 = null;
                 return;
@@ -394,8 +391,7 @@ namespace lingvo.ts.modelbuilder
                 break;
             }
         }
-        [M(O.AggressiveInlining)]
-        private void ProcessWordActionClearCyrillicsAndDigitsChars( string word )
+        [M(O.AggressiveInlining)] private void ProcessWordActionClearCyrillicsAndDigitsChars( string word )
         {
             if ( word.HasCyrillicsOrDigitsChars() )
             {
@@ -405,7 +401,7 @@ namespace lingvo.ts.modelbuilder
             if ( _Bp.SingleWordMaxLength < word.Length )
             {
 #if DEBUG
-                Console.Write( $"\r\nskip-by-len #{(++_SkipWordCount)}: '{word}'" );
+                Console.WriteLine( $"\r\nskip-by-len #{(++_SkipWordCount)}: '{word}'" );
 #endif
                 _Word_prev3 = _Word_prev2 = _Word_prev1 = null;
                 return;
@@ -483,8 +479,7 @@ namespace lingvo.ts.modelbuilder
         }
 
 
-        [M(O.AggressiveInlining)]
-        private void CheckPortion( Dictionary< string, int > dict, NGramsEnum ngram )
+        [M(O.AggressiveInlining)] private void CheckPortion( Dictionary< string, int > dict, NGramsEnum ngram )
         {
             if ( _Bp.MaxPortionSize <= dict.Count )
             {
@@ -494,9 +489,7 @@ namespace lingvo.ts.modelbuilder
                 dict.Clear();
             }
         }
-
-        [M(O.AggressiveInlining)]
-        private void CheckLastPortion( Dictionary< string, int > dict, NGramsEnum ngram )
+        [M(O.AggressiveInlining)] private void CheckLastPortion( Dictionary< string, int > dict, NGramsEnum ngram )
         {
             if ( dict.Count != 0 )
             {
@@ -558,7 +551,7 @@ namespace lingvo.ts.modelbuilder
 
                 //-1-
                 _OutputFilenames[ ngram ] = new List< string >();
-                var ss  = new SortedSet< TermFrequency >( TermFrequencyComparer.Instance );
+                var ss  = new SortedSet< TermFrequency >( TermFrequency.Comparer.Instance );
                 foreach ( var tf in GroupByMerging_1( outputFilenames ) )
                 {
                     ss.Add( tf );
@@ -837,7 +830,7 @@ namespace lingvo.ts.modelbuilder
 #if DEBUG
                             else
                             {
-                                Console.Write( $"\r\nskip-by-len #{(++skipWordCount)}: '{word}'" );
+                                Console.WriteLine( $"\r\nskip-by-len #{(++skipWordCount)}: '{word}'" );
                             } 
 #endif
                         }
@@ -856,7 +849,7 @@ namespace lingvo.ts.modelbuilder
 #if DEBUG
                             else
                             {
-                                Console.Write( $"\r\nskip-by-len #{(++skipWordCount)}: '{word}'" );
+                                Console.WriteLine( $"\r\nskip-by-len #{(++skipWordCount)}: '{word}'" );
                             } 
 #endif
                         }
@@ -879,7 +872,7 @@ namespace lingvo.ts.modelbuilder
 #if DEBUG
                         else
                         {
-                            Console.Write( $"\r\nskip-by-len #{(++skipWordCount)}: '{word}'" );
+                            Console.WriteLine( $"\r\nskip-by-len #{(++skipWordCount)}: '{word}'" );
                         }
 #endif
                     };
@@ -895,7 +888,7 @@ namespace lingvo.ts.modelbuilder
 #if DEBUG
                         else
                         {
-                            Console.Write( $"\r\nskip-by-len #{(++skipWordCount)}: '{word}'" );
+                            Console.WriteLine( $"\r\nskip-by-len #{(++skipWordCount)}: '{word}'" );
                         }
 #endif
                     };
@@ -910,7 +903,7 @@ namespace lingvo.ts.modelbuilder
             var fi_num   = 0;
             foreach ( var fi in fis )
             {
-                if ( first_fi == null)
+                if ( first_fi == null )
                 {
                     first_fi = fi;
                 }
@@ -1067,7 +1060,6 @@ namespace lingvo.ts.modelbuilder
 
             portioner.BuildTFMatrix_UsePortion();
 
-            portioner = null;
             GC.Collect();
         }
     }
@@ -1077,8 +1069,7 @@ namespace lingvo.ts.modelbuilder
     /// </summary>
     internal static class Extensions
     {
-        [M(O.AggressiveInlining)]
-        unsafe public static bool HasCyrillicsChars( this string value )
+        [M(O.AggressiveInlining)] unsafe public static bool HasCyrillicsChars( this string value )
         {
             fixed ( char* _base = value )
             {
@@ -1100,9 +1091,7 @@ namespace lingvo.ts.modelbuilder
                 }
             }
         }
-
-        [M(O.AggressiveInlining)]
-        unsafe public static bool HasDigitsChars( this string value )
+        [M(O.AggressiveInlining)] unsafe public static bool HasDigitsChars( this string value )
         {
             fixed ( char* _base = value )
             {
@@ -1121,9 +1110,7 @@ namespace lingvo.ts.modelbuilder
                 }
             }
         }
-
-        [M(O.AggressiveInlining)]
-        unsafe public static bool HasCyrillicsOrDigitsChars( this string value )
+        [M(O.AggressiveInlining)] unsafe public static bool HasCyrillicsOrDigitsChars( this string value )
         {
             fixed ( char* _base = value )
             {

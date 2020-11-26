@@ -14,18 +14,19 @@ namespace lingvo.ts
         {
             MAX_INPUTTEXT_LENGTH              = int.Parse( ConfigurationManager.AppSettings[ "MAX_INPUTTEXT_LENGTH" ] );
             CONCURRENT_FACTORY_INSTANCE_COUNT = int.Parse( ConfigurationManager.AppSettings[ "CONCURRENT_FACTORY_INSTANCE_COUNT" ] );
-            CYRILLIC_LETTERS_PERCENT          = Math.Min( 100, Math.Max( 0, int.Parse( ConfigurationManager.AppSettings[ "CYRILLIC_LETTERS_PERCENT" ] ) ) );
-
 
             _RU_MODEL_DICTIONARY_CAPACITY = Get_MODEL_DICTIONARY_CAPACITY( "RU" );
             _RU_BINARY_MODEL_FILENAMES    = Get_BINARY_MODEL_FILENAMES   ( "RU" );
 
             _EN_MODEL_DICTIONARY_CAPACITY = Get_MODEL_DICTIONARY_CAPACITY( "EN" );
             _EN_BINARY_MODEL_FILENAMES    = Get_BINARY_MODEL_FILENAMES   ( "EN" );
+
+            _DE_MODEL_DICTIONARY_CAPACITY = Get_MODEL_DICTIONARY_CAPACITY( "DE" );
+            _DE_BINARY_MODEL_FILENAMES    = Get_BINARY_MODEL_FILENAMES   ( "DE" );
         }
 
         private static int      Get_MODEL_DICTIONARY_CAPACITY( string lang ) { return (int.Parse( ConfigurationManager.AppSettings[ lang + "_MODEL_DICTIONARY_CAPACITY" ] )); }
-        private static string   Get_BINARY_MODEL_FILENAME    ( string lang ) { return (ConfigurationManager.AppSettings[ lang + "_BINARY_MODEL_FILENAME" ]); }
+        //private static string   Get_BINARY_MODEL_FILENAME    ( string lang ) { return (ConfigurationManager.AppSettings[ lang + "_BINARY_MODEL_FILENAME" ]); }
         private static string[] Get_BINARY_MODEL_FILENAMES   ( string lang )
         {
             var binaryModelDirectory = ConfigurationManager.AppSettings[ lang + "_BINARY_MODEL_DIRECTORY" ] ?? string.Empty;
@@ -61,14 +62,16 @@ namespace lingvo.ts
         private int      _RU_MODEL_DICTIONARY_CAPACITY;
         private string[] _EN_BINARY_MODEL_FILENAMES;
         private int      _EN_MODEL_DICTIONARY_CAPACITY;
+        private string[] _DE_BINARY_MODEL_FILENAMES;
+        private int      _DE_MODEL_DICTIONARY_CAPACITY;
 
         public int MAX_INPUTTEXT_LENGTH              { get; private set; }
         public int CONCURRENT_FACTORY_INSTANCE_COUNT { get; private set; }
-        public int CYRILLIC_LETTERS_PERCENT          { get; private set; }
 
         #region [.ModelConfig.]
-        public BinaryModelConfig GetBinaryModelConfig_RU() { return (new BinaryModelConfig( _RU_BINARY_MODEL_FILENAMES ) { ModelDictionaryCapacity = _RU_MODEL_DICTIONARY_CAPACITY }); }
-        public BinaryModelConfig GetBinaryModelConfig_EN() { return (new BinaryModelConfig( _EN_BINARY_MODEL_FILENAMES ) { ModelDictionaryCapacity = _EN_MODEL_DICTIONARY_CAPACITY }); }
+        public BinaryModelConfig GetBinaryModelConfig_RU() { return (new BinaryModelConfig( _RU_BINARY_MODEL_FILENAMES, _RU_MODEL_DICTIONARY_CAPACITY )); }
+        public BinaryModelConfig GetBinaryModelConfig_EN() { return (new BinaryModelConfig( _EN_BINARY_MODEL_FILENAMES, _EN_MODEL_DICTIONARY_CAPACITY )); }
+        public BinaryModelConfig GetBinaryModelConfig_DE() { return (new BinaryModelConfig( _DE_BINARY_MODEL_FILENAMES, _DE_MODEL_DICTIONARY_CAPACITY )); }
         #endregion
     }
 }

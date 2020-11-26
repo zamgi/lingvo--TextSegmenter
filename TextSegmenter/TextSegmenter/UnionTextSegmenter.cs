@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace lingvo.ts
 {
     /// <summary>
     /// 
     /// </summary>
-    public struct UnionTextSegmenter : ITextSegmenter, IDisposable
+    public sealed class UnionTextSegmenter : ITextSegmenter, IDisposable
     {
         /// <summary>
         /// 
@@ -57,14 +59,17 @@ namespace lingvo.ts
             public static Result_Offset Create( IReadOnlyList< TermProbability_Offset > tps, LanguageEnum lang ) => new Result_Offset() { TPS = tps, Language = lang };
         }
 
+        #region [.ctor().]
         private NativeTextMMFModelBinary[] _NativeTextMMFModelsBinary;
         private TextSegmenter[]            _TextSegmenters;
         private LanguageEnum[]             _Languages;
 
         public UnionTextSegmenter( params InitParam_v1[] ps )
         {
-            if ( ps == null || !ps.Any() ) throw (new ArgumentNullException( nameof(ps) ));
+            if ( (ps == null) || !ps.Any() ) throw (new ArgumentNullException( nameof(ps) ));
 
+            #region comm. [.consecutively.]
+            /*
             _NativeTextMMFModelsBinary = new NativeTextMMFModelBinary[ ps.Length ];
             _TextSegmenters            = new TextSegmenter           [ ps.Length ];
             _Languages                 = new LanguageEnum            [ ps.Length ];
@@ -77,10 +82,30 @@ namespace lingvo.ts
                 _TextSegmenters           [ i ] = new TextSegmenter( m );
                 _Languages                [ i ] = p.Language;
             }
+            //*/
+            #endregion
+
+            #region [.parallel.]
+            var nativeTextMMFModelsBinary = new NativeTextMMFModelBinary[ ps.Length ];
+            var textSegmenters            = new TextSegmenter           [ ps.Length ];
+            var languages                 = new LanguageEnum            [ ps.Length ];
+
+            Parallel.ForEach( ps, (p, _, i) =>
+            {
+                var m = new NativeTextMMFModelBinary( p.ModelConfigs );
+                nativeTextMMFModelsBinary[ i ] = m;
+                textSegmenters           [ i ] = new TextSegmenter( m );
+                languages                [ i ] = p.Language;
+            });
+
+            _NativeTextMMFModelsBinary = nativeTextMMFModelsBinary;
+            _TextSegmenters            = textSegmenters;
+            _Languages                 = languages;
+            #endregion
         }
         public UnionTextSegmenter( params InitParam_v2[] ps )
         {
-            if ( ps == null || !ps.Any() ) throw (new ArgumentNullException( nameof(ps) ));
+            if ( (ps == null) || !ps.Any() ) throw (new ArgumentNullException( nameof(ps) ));
 
             _NativeTextMMFModelsBinary = null;
             _TextSegmenters            = new TextSegmenter[ ps.Length ];
@@ -114,11 +139,13 @@ namespace lingvo.ts
             }
             _Languages = null;
         }
+        #endregion
 
         public IReadOnlyList< TermProbability > Run( string text ) => RunBest( text ).TPS;
+        public IReadOnlyList< TermProbability > Run_Debug( string text ) => RunBest_Debug( text ).TPS;
         public IReadOnlyList< TermProbability_Offset > Run_Offset( string text ) => RunBest_Offset( text ).TPS;
 
-        private TextSegmenter GetByLanguage( LanguageEnum lang )
+        private TextSegmenter GetTextSegmenter( LanguageEnum lang )
         {
             for ( var i = _Languages.Length - 1; 0 <= i; i-- )
             {
@@ -130,16 +157,9 @@ namespace lingvo.ts
 
             throw (new ArgumentException( $"Language not found: '{lang}'" ));
         }
-        public IReadOnlyList< TermProbability > Run( string text, LanguageEnum lang )
-        {
-            var ts = GetByLanguage( lang );
-            return (ts.Run( text ));
-        }
-        public IReadOnlyList< TermProbability_Offset > Run_Offset( string text, LanguageEnum lang )
-        {
-            var ts = GetByLanguage( lang );
-            return (ts.Run_Offset( text ));
-        }
+        public IReadOnlyList< TermProbability > Run( string text, LanguageEnum lang ) => GetTextSegmenter( lang ).Run( text );
+        public IReadOnlyList< TermProbability > Run_Debug( string text, LanguageEnum lang ) => GetTextSegmenter( lang ).Run_Debug( text );
+        public IReadOnlyList< TermProbability_Offset > Run_Offset( string text, LanguageEnum lang ) => GetTextSegmenter( lang ).Run_Offset( text );
 
         public Result RunBest( string text )
         {
@@ -148,7 +168,7 @@ namespace lingvo.ts
             for ( var i = _TextSegmenters.Length - 1; 0 <= i; i-- )
             {
                 var tps  = _TextSegmenters[ i ].Run( text );
-                var prob = N( tps.Sum( tp => Math.Log( tp.Probability ) ) );
+                var prob = tps.Sum( tp => Math.Log( tp.Probability ) ).N();
                 if ( bestProb < prob )
                 {
                     bestProb   = prob;
@@ -157,14 +177,85 @@ namespace lingvo.ts
             }
             return (bestResult);
         }
+        public Result RunBest_Debug( string text )
+        {
+            var bestResult = default(Result);
+            var bestProb   = double.NegativeInfinity;
+            for ( var i = _TextSegmenters.Length - 1; 0 <= i; i-- )
+            {
+                var tps = _TextSegmenters[ i ].Run_Debug( text );
+                var prob = tps.Sum( tp => Math.Log( tp.Probability ) ).N();
+                if ( bestProb < prob )
+                {
+                    bestProb   = prob;
+                    bestResult = Result.Create( tps, _Languages[ i ] );
+                }
+            }
+            return (bestResult);
+        }
         public Result_Offset RunBest_Offset( string text )
         {
+            var bestResult = default(Result_Offset);
+
+            #region [.parallel.]
+            if ( _TextSegmenters.Length == 1 )
+            {
+                var tps = _TextSegmenters[ 0 ].Run_Offset( text );
+                bestResult = Result_Offset.Create( tps, _Languages[ 0 ] );                
+            }
+            else
+            {
+                #region comm. v1
+                /*
+                var res = new (IReadOnlyList< TermProbability_Offset > tps, double prob, LanguageEnum lang)[ _TextSegmenters.Length ];
+                Parallel.For( 0, _TextSegmenters.Length, i =>
+                {
+                    var tps  = _TextSegmenters[ i ].Run_Offset( text );
+                    var prob = tps.Sum( tp => Math.Log( tp.Probability ) ).N();
+                    res[ i ] = (tps, prob, _Languages[ i ]);
+                });
+
+                var bestProb = double.NegativeInfinity;
+                for ( var i = res.Length - 1; 0 <= i; i-- )
+                {
+                    ref readonly var t = ref res[ i ];
+                    if ( bestProb < t.prob )
+                    {
+                        bestProb   = t.prob;
+                        bestResult = Result_Offset.Create( t.tps, t.lang );
+                    }
+                }                 
+                */
+                #endregion
+
+                var llock = new LightLock();
+                var bestProb = double.NegativeInfinity;
+                Parallel.For( 0, _TextSegmenters.Length, i =>
+                {
+                    var tps  = _TextSegmenters[ i ].Run_Offset( text );
+                    var prob = tps.Sum( tp => Math.Log( tp.Probability ) ).N();
+
+                    llock.Enter();
+                    if ( bestProb < prob )
+                    {
+                        bestProb   = prob;
+                        bestResult = Result_Offset.Create( tps, _Languages[ i ] );
+                    }
+                    llock.Exit();
+                });
+            }
+
+            return (bestResult);
+            #endregion
+
+            #region comm. [.consecutively.]
+            /*
             var bestResult = default(Result_Offset);
             var bestProb   = double.NegativeInfinity;
             for ( var i = _TextSegmenters.Length - 1; 0 <= i; i-- )
             {
                 var tps  = _TextSegmenters[ i ].Run_Offset( text );
-                var prob = N( tps.Sum( tp => Math.Log( tp.Probability ) ) );
+                var prob = tps.Sum( tp => Math.Log( tp.Probability ) ).N();
                 if ( bestProb < prob )
                 {
                     bestProb   = prob;
@@ -172,7 +263,10 @@ namespace lingvo.ts
                 }
             }
             return (bestResult);
+            //*/
+            #endregion
         }
+
 
         public IReadOnlyCollection< (Result r, double prob) > Run4All( string text )
         {
@@ -182,7 +276,7 @@ namespace lingvo.ts
             {
                 var tps    = _TextSegmenters[ i ].Run( text );
                 var result = Result.Create( tps, _Languages[ i ] );
-                var prob   = N( tps.Sum( tp => Math.Log( tp.Probability ) ) );
+                var prob   = tps.Sum( tp => Math.Log( tp.Probability ) ).N();
 
                 res[ i ] = (result, prob);
             }
@@ -208,6 +302,38 @@ namespace lingvo.ts
                 t.prob = (t.prob - min) * coef + new_min;
             }
         }
-        private static double N( double d ) => (double.IsInfinity( d ) ? double.MinValue : d);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    internal struct LightLock
+    {
+        private const int OCCUPIED = 1;
+        private const int FREE     = 0;
+
+        private int _Lock;
+
+        public bool TryEnter() => (Interlocked.CompareExchange( ref _Lock, OCCUPIED, FREE ) == FREE);
+        public void Enter()
+        {
+            if ( Interlocked.CompareExchange( ref _Lock, OCCUPIED, FREE ) != FREE )
+            {
+                var spinWait = default(SpinWait);
+                while ( Interlocked.CompareExchange( ref _Lock, OCCUPIED, FREE ) != FREE )
+                {
+                    spinWait.SpinOnce();
+                }
+            }
+        }
+        public void Exit() => Interlocked.Exchange( ref _Lock, FREE ); //Volatile.Write( ref _Locker, FREE );
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    internal static class UnionTextSegmenterExtensions
+    {
+        public static double N( this double d ) => (double.IsNegativeInfinity( d ) ? double.MinValue : d);
     }
 }

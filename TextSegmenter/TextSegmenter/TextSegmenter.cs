@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using lingvo.core;
 
@@ -49,6 +48,19 @@ namespace lingvo.ts
             var tuples = _VTS.Run( text_upper );
             return (tuples);
         }
+        public IReadOnlyList< TermProbability > Run_Debug( string text )
+        {
+            if ( text.IsNullOrWhiteSpace() )
+            {
+                return (TERMPROBABILITY_EMPTY);
+            }
+            //---------------------------------------------------------//
+
+            var text_upper = StringsHelper.ToUpperInvariant( text ); //---StringsHelper.ToUpperInvariantInPlace( text );
+
+            var tuples = _VTS.Run_Debug( text_upper );
+            return (tuples);
+        }
         unsafe public IReadOnlyList< TermProbability_Offset > Run_Offset( string text )
         {
             var textAsUpper = StringsHelper.ToUpperInvariant( text, out var isNullOrWhiteSpace );
@@ -80,82 +92,6 @@ namespace lingvo.ts
             }
             */ 
             #endregion
-        }
-        #endregion
-
-        #region [.helper's.]
-        unsafe public static bool HasCyrillicLetters( string text, int cyrillicLettersPercent, out int resultCyrillicLettersPercent )
-        {
-            resultCyrillicLettersPercent = 100;
-            if ( cyrillicLettersPercent <= 0 )
-            {
-                return (true);
-            }                
-
-            var len  = text.Length;
-            var rate = (cyrillicLettersPercent / 100.0f);
-            var cyrillicLettersThreshold = (int) (rate * len); //Convert.ToInt32( rate * len );
-            var cyrillicLettersCount = 0;
-            var nonLettersCount = 0;
-            fixed ( char* _base = text )
-            fixed ( CharType* ctm = xlat.CHARTYPE_MAP )
-            {                
-                for ( int i = 0; i < len; i++ )
-                {
-                    var ch = *(_base + i);
-                    if ( 'А' <= ch && ch <= 'я') // кирилический символ
-                    {
-                        if ( cyrillicLettersThreshold <= ++cyrillicLettersCount )
-                        {
-                			resultCyrillicLettersPercent = (int)((1.0 * cyrillicLettersCount / (len - nonLettersCount)) * 100.0); //Convert.ToInt32( (1.0 * cyrillicLettersCount / (len - nonLettersCount)) * 100.0 );
-                            return (true);
-                        }
-                    }
-                    else if ( (*(ctm + ch) & CharType.IsLetter) != CharType.IsLetter )
-                    {
-                        nonLettersCount++;
-                    }
-                }
-
-                cyrillicLettersThreshold = (int)(rate * (len - nonLettersCount)); //Convert.ToInt32( rate * (len - nonLettersCount) );
-                resultCyrillicLettersPercent = (int)((1.0 * cyrillicLettersCount / (len - nonLettersCount)) * 100.0); //Convert.ToInt32( (1.0 * cyrillicLettersCount / (len - nonLettersCount)) * 100.0 );
-                return (cyrillicLettersThreshold <= cyrillicLettersCount);
-            }
-        }
-        unsafe public static bool HasCyrillicLetters( string text, int cyrillicLettersPercent )
-        {
-            if ( cyrillicLettersPercent <= 0 )
-            {
-                return (true);
-            }                
-
-            var len  = text.Length;
-            var rate = (cyrillicLettersPercent / 100.0f);
-            var cyrillicLettersThreshold = (int) (rate * len); //Convert.ToInt32( rate * len );
-            var cyrillicLettersCount = 0;
-            var nonLettersCount = 0;
-            fixed ( char* _base = text )
-            fixed ( CharType* ctm = xlat.CHARTYPE_MAP )
-            {                
-                for ( int i = 0; i < len; i++ )
-                {
-                    var ch = *(_base + i); //*ptr;
-                    if ( 'А' <= ch && ch <= 'я') // кирилический символ
-                    {
-                        if ( cyrillicLettersThreshold <= ++cyrillicLettersCount )
-                        {
-                            return (true);
-                        }
-                    }
-                    else if ( (*(ctm + ch) & CharType.IsLetter) != CharType.IsLetter )
-                    {
-                        nonLettersCount++;
-                    }
-                }
-
-                cyrillicLettersThreshold = (int)(rate * (len - nonLettersCount)); //Convert.ToInt32( rate * (len - nonLettersCount) );
-                return (cyrillicLettersThreshold <= cyrillicLettersCount);
-            }
         }
         #endregion
     }

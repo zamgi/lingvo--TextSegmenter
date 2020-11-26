@@ -9,8 +9,7 @@ namespace lingvo.core
     /// <summary>
     /// 
     /// </summary>
-    [Flags]
-    public enum CharType : ushort
+    [Flags] public enum CharType : ushort
     {
         __UNDEFINE__  = 0x0,
 
@@ -196,52 +195,6 @@ namespace lingvo.core
 #endif
         }
 		
-		/*
-#if XLAT_CHARTYPE_MAP       
-        public static bool IsUpper( char ch )
-        {
-            return ((CHARTYPE_MAP[ ch ] & CharType.IsUpper) == CharType.IsUpper);
-        }
-        public static bool IsLower( char ch )
-        {
-            return ((CHARTYPE_MAP[ ch ] & CharType.IsLower) == CharType.IsLower);
-        }
-        public static bool IsLetter( char ch )
-        {
-            return ((CHARTYPE_MAP[ ch ] & CharType.IsLetter) == CharType.IsLetter);
-        }
-        public static bool IsDigit( char ch )
-        {
-            return ((CHARTYPE_MAP[ ch ] & CharType.IsDigit) == CharType.IsDigit);
-        }
-        public static bool IsWhiteSpace( char ch )
-        {
-            return ((CHARTYPE_MAP[ ch ] & CharType.IsWhiteSpace) == CharType.IsWhiteSpace);
-        }
-        public static bool IsPunctuation( char ch )
-        {
-            return ((CHARTYPE_MAP[ ch ] & CharType.IsPunctuation) == CharType.IsPunctuation);
-        }
-
-        public static bool IsHyphen( char ch )
-        {
-            return ((CHARTYPE_MAP[ ch ] & CharType.IsHyphen) == CharType.IsHyphen);
-            /*
-            switch ( ch )
-            {
-                case '-':
-                case '—':
-                case '–':
-                    return (true);
-
-                default:
-                    return (false);
-            }
-            * /
-        }
-#endif
-		*/
-
         public static bool IsDot( char ch )
         {
             //return (ch == '.');
@@ -257,10 +210,7 @@ namespace lingvo.core
             }
             //*/
         }
-        public static bool IsAscii( char ch )
-        {
-            return (0 <= ch && ch <= 127);
-        }
+        public static bool IsAscii( char ch ) => (0 <= ch && ch <= 127);
         public static bool IsURIschemes( char ch )
         {
             if ( ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') )
@@ -377,12 +327,12 @@ namespace lingvo.core
 
 #if XLAT_CHARTYPE_MAP
             //-4-
-            var _x_ = new ushort[ xlat.CHARTYPE_MAP.Length ];
-            for ( int i = 0; i < _x_.Length; i++ )
+            var x = new ushort[ xlat.CHARTYPE_MAP.Length ];
+            for ( int i = 0; i < x.Length; i++ )
             {
-                _x_[ i ] = (ushort) xlat.CHARTYPE_MAP[ i ];
+                x[ i ] = (ushort) xlat.CHARTYPE_MAP[ i ];
             }
-            var ctmGCHandle = GCHandle.Alloc( _x_ /*xlat.CHARTYPE_MAP*/, GCHandleType.Pinned );
+            var ctmGCHandle = GCHandle.Alloc( x /*xlat.CHARTYPE_MAP*/, GCHandleType.Pinned );
             _CHARTYPE_MAP   = (CharType*) ctmGCHandle.AddrOfPinnedObject().ToPointer();
             //_CHARTYPE_MAP = (CharType*) Marshal.UnsafeAddrOfPinnedArrayElement( xlat.CHARTYPE_MAP, 0 ).ToPointer();
 #endif			
@@ -397,34 +347,13 @@ namespace lingvo.core
         public static readonly xlat_Unsafe Inst = new xlat_Unsafe();
 
 #if XLAT_CHARTYPE_MAP
-        public bool IsUpper( char ch )
-        {
-            return ((_CHARTYPE_MAP[ ch ] & CharType.IsUpper) == CharType.IsUpper);
-        }
-        public bool IsLower( char ch )
-        {
-            return ((_CHARTYPE_MAP[ ch ] & CharType.IsLower) == CharType.IsLower);
-        }
-        public bool IsLetter( char ch )
-        {
-            return ((_CHARTYPE_MAP[ ch ] & CharType.IsLetter) == CharType.IsLetter);
-        }
-        public bool IsDigit( char ch )
-        {
-            return ((_CHARTYPE_MAP[ ch ] & CharType.IsDigit) == CharType.IsDigit);
-        }
-        public bool IsWhiteSpace( char ch )
-        {
-            return ((_CHARTYPE_MAP[ ch ] & CharType.IsWhiteSpace) == CharType.IsWhiteSpace);
-        }
-        public bool IsPunctuation( char ch )
-        {
-            return ((_CHARTYPE_MAP[ ch ] & CharType.IsPunctuation) == CharType.IsPunctuation);
-        }
-        public bool IsHyphen( char ch )
-        {
-            return ((_CHARTYPE_MAP[ ch ] & CharType.IsHyphen) == CharType.IsHyphen);
-        }
+        public bool IsUpper( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsUpper) == CharType.IsUpper);
+        public bool IsLower( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsLower) == CharType.IsLower);
+        public bool IsLetter( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsLetter) == CharType.IsLetter);
+        public bool IsDigit( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsDigit) == CharType.IsDigit);
+        public bool IsWhiteSpace( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsWhiteSpace) == CharType.IsWhiteSpace);
+        public bool IsPunctuation( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsPunctuation) == CharType.IsPunctuation);
+        public bool IsHyphen( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsHyphen) == CharType.IsHyphen);
 #endif		
     }
 }

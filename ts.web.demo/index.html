@@ -25,13 +25,14 @@
 
                         <h2 class="main-header">
                             <span id="textLength"></span>
-                            <span>Enter the text for segmentation:</span>
+                            <span>Enter the text without whitespaces for segmentation:</span>
                             <span style="position: absolute; right: 125px;">
                                 <span style="color: dimgrey;">language:</span>
                                 <select id="lang" title="language">
-                                    <option value="any">ru, en</option>
+                                    <option value="any">ru, en, de</option>
                                     <option value="ru">ru</option>
                                     <option value="en">en</option>
+                                    <option value="de">de</option>
                                 </select>
                             </span>
                             <span id="resetText2Default" title="reset text to default">x</span>
@@ -45,7 +46,7 @@
                         </div>
                         <h3 class="result-info" style="display:none"></h3>
 
-                        <div id="processResult" style="margin-top: 20px;">
+                        <div id="processResult">
                             <table>
                                 <tbody></tbody>
                             </table>

@@ -10,7 +10,7 @@ namespace lingvo.ts.modelbuilder
     /// </summary>
     internal static class Program
     {
-        private static void Main( string[] args )
+        private static void Main()
         {
             var wasErrors = false;
             try

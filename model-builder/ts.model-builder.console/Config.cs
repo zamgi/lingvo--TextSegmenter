@@ -62,21 +62,21 @@ namespace lingvo
             }
         }
 
-        public bool       USE_HIGH_PRIORITY { get; private set; }
-        public NGramsEnum NGARMS            { get; private set; }
-        public float?     CUT_PERCENT       { get; private set; }
-        public string     URL_DETECTOR_RESOURCES_XML_FILENAME { get; private set; }
+        public bool       USE_HIGH_PRIORITY { get; }
+        public NGramsEnum NGARMS            { get; }
+        public float?     CUT_PERCENT       { get; }
+        public string     URL_DETECTOR_RESOURCES_XML_FILENAME { get; }
 
-        public string   INPUT_DIRECTORY        { get; private set; }
-        public Encoding INPUT_ENCODING         { get; private set; }
-        public bool     CLEAR_CYRILLICS_CHARS  { get; private set; }
-        public bool     CLEAR_DIGITS_CHARS     { get; private set; }        
-        public int      SINGLE_WORD_MAX_LENGTH { get; private set; }
+        public string   INPUT_DIRECTORY        { get; }
+        public Encoding INPUT_ENCODING         { get; }
+        public bool     CLEAR_CYRILLICS_CHARS  { get; }
+        public bool     CLEAR_DIGITS_CHARS     { get; }        
+        public int      SINGLE_WORD_MAX_LENGTH { get; }
 
-        public string   OUTPUT_DIRECTORY { get; private set; }
-        public Encoding OUTPUT_ENCODING  { get; private set; }
+        public string   OUTPUT_DIRECTORY { get; }
+        public Encoding OUTPUT_ENCODING  { get; }
 
-        public bool USE_PORTION      { get; private set; }
-        public int  MAX_PORTION_SIZE { get; private set; }
+        public bool USE_PORTION      { get; }
+        public int  MAX_PORTION_SIZE { get; }
     }
 }

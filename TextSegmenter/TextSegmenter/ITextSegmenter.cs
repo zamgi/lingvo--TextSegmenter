@@ -34,6 +34,7 @@ namespace lingvo.ts
     public interface ITextSegmenter
     {
         IReadOnlyList< TermProbability > Run( string text );
+        IReadOnlyList< TermProbability > Run_Debug( string text );
         IReadOnlyList< TermProbability_Offset > Run_Offset( string text );
     }
 }

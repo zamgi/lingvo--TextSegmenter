@@ -48,7 +48,7 @@ namespace lingvo.ts.modelconverter
                 Console.WriteLine( Environment.NewLine + ex + Environment.NewLine );
                 Console.ResetColor();
 
-                Console.WriteLine( $"[{Environment.NewLine}.....finita fusking comedy (push ENTER 4 exit).....]" );
+                Console.WriteLine( $"{Environment.NewLine}[.....finita fusking comedy (push ENTER 4 exit).....]" );
                 Console.ReadLine();
             }
         }

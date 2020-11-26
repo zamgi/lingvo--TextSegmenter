@@ -23,10 +23,13 @@ namespace lingvo.ts.TestApp
             RU_TEXT_MODEL_FILENAME = ConfigurationManager.AppSettings[ "RU_TEXT_MODEL_FILENAME" ];
 
             _RU_MODEL_DICTIONARY_CAPACITY = Get_MODEL_DICTIONARY_CAPACITY( "RU" );
-            _RU_BINARY_MODEL_FILENAMES     = Get_BINARY_MODEL_FILENAMES  ( "RU" );
+            _RU_BINARY_MODEL_FILENAMES    = Get_BINARY_MODEL_FILENAMES   ( "RU" );
 
             _EN_MODEL_DICTIONARY_CAPACITY = Get_MODEL_DICTIONARY_CAPACITY( "EN" );
-            _EN_BINARY_MODEL_FILENAMES     = Get_BINARY_MODEL_FILENAMES  ( "EN" );
+            _EN_BINARY_MODEL_FILENAMES    = Get_BINARY_MODEL_FILENAMES   ( "EN" );
+
+            _DE_MODEL_DICTIONARY_CAPACITY = Get_MODEL_DICTIONARY_CAPACITY( "DE" );
+            _DE_BINARY_MODEL_FILENAMES    = Get_BINARY_MODEL_FILENAMES   ( "DE" );
         }
 
         private static int      Get_MODEL_DICTIONARY_CAPACITY( string lang ) => int.Parse( ConfigurationManager.AppSettings[ $"{lang}_MODEL_DICTIONARY_CAPACITY" ] );
@@ -67,11 +70,14 @@ namespace lingvo.ts.TestApp
         private int      _RU_MODEL_DICTIONARY_CAPACITY;
         private string[] _EN_BINARY_MODEL_FILENAMES;
         private int      _EN_MODEL_DICTIONARY_CAPACITY;
+        private string[] _DE_BINARY_MODEL_FILENAMES;
+        private int      _DE_MODEL_DICTIONARY_CAPACITY;
 
         public TextModelConfig GetTextModelConfig_RU() => new TextModelConfig( RU_TEXT_MODEL_FILENAME, _RU_MODEL_DICTIONARY_CAPACITY );
 
-        public BinaryModelConfig GetBinaryModelConfig_RU() => new BinaryModelConfig( _RU_BINARY_MODEL_FILENAMES ) { ModelDictionaryCapacity = _RU_MODEL_DICTIONARY_CAPACITY };
-        public BinaryModelConfig GetBinaryModelConfig_EN() => new BinaryModelConfig( _EN_BINARY_MODEL_FILENAMES ) { ModelDictionaryCapacity = _EN_MODEL_DICTIONARY_CAPACITY };
+        public BinaryModelConfig GetBinaryModelConfig_RU() => new BinaryModelConfig( _RU_BINARY_MODEL_FILENAMES, _RU_MODEL_DICTIONARY_CAPACITY );
+        public BinaryModelConfig GetBinaryModelConfig_EN() => new BinaryModelConfig( _EN_BINARY_MODEL_FILENAMES, _EN_MODEL_DICTIONARY_CAPACITY );
+        public BinaryModelConfig GetBinaryModelConfig_DE() => new BinaryModelConfig( _DE_BINARY_MODEL_FILENAMES, _DE_MODEL_DICTIONARY_CAPACITY );
     }
 
     /// <summary>
@@ -100,70 +106,55 @@ namespace lingvo.ts.TestApp
 
         private static void Test__ManagedTextModel_RU()
         {
-            Console.Write( "load -text- language model..." );
+            Console.Write( "load \"-text-\" language model..." );
 
             var sw = Stopwatch.StartNew();            
             using ( var model = new ManagedTextModel( Config.Inst.GetTextModelConfig_RU() ) )
             {
                 var count = model.RecordCount;
-                sw.Stop();
 
-                GCCollect();
-                Console.WriteLine( $"=> elapsed: {sw.Elapsed}, record-count: {count}\r\n" );
+                Console.WriteLine( $"=> elapsed: {sw.StopAndElapsed()}, record-count: {count}\r\n" );
 
-                //*
                 Test__TextSegmenter( model );
-                //* /
 
                 Console.Write( "\r\ndisposing language model..." );                    
             }
-            GCCollect();
             Console.WriteLine( "=> end\r\n" );
         }
         private static void Test__NativeTextMMFModelBinary_RU()
         {
-            Console.Write( "load -binary- language model..." );
+            Console.Write( "load \"-binary-\" language model..." );
 
             var sw = Stopwatch.StartNew();
             using ( var model = new NativeTextMMFModelBinary( Config.Inst.GetBinaryModelConfig_RU() ) )
             {
                 var count = model.RecordCount;
-                sw.Stop();
 
-                GCCollect();
-                Console.WriteLine( $"=> elapsed: {sw.Elapsed}, record-count: {count}\r\n" );
+                Console.WriteLine( $"=> elapsed: {sw.StopAndElapsed()}, record-count: {count}\r\n" );
 
-                //*
                 Test__TextSegmenter( model );
-                //* /
 
                 Console.Write( "\r\ndisposing language model..." );
             }
-            GCCollect();
             Console.WriteLine( "=> end\r\n" );
         }
 
         private static void Test__UnionTextSegmenter()
         {
-            Console.Write( "load -binary- language model's..." );
+            Console.Write( "load \"-binary-\" language model's..." );
 
             var sw = Stopwatch.StartNew();
             using ( var uts = new UnionTextSegmenter( _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_RU(), _ULanguage_.RU ),
-                                                      _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_EN(), _ULanguage_.EN ) )
+                                                      _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_EN(), _ULanguage_.EN ),
+                                                      _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_DE(), _ULanguage_.DE ) )
                   )
             {
-                sw.Stop();
+                Console.WriteLine( $"=> elapsed: {sw.StopAndElapsed()}\r\n" );
 
-                GCCollect();
-                Console.WriteLine( $"=> elapsed: {sw.Elapsed}\r\n" );
-
-                //*
                 Test__UnionTextSegmenter( uts );
-                //* /
 
                 Console.Write( "\r\ndisposing language model's..." );
             }
-            GCCollect();
             Console.WriteLine( "=> end\r\n" );
         }
 
@@ -171,59 +162,68 @@ namespace lingvo.ts.TestApp
         {
             using ( var ts = new TextSegmenter( model ) )
             {
-                ts.RunToConsole( "бабушкакозликаоченьлюбила" );
-                ts.RunToConsole( "баб_ушкакозликаоченьлюбила" );
-                ts.RunToConsole( "вротебатьебатькопать" );
-                ts.RunToConsole( "волокно" );
-                ts.RunToConsole( "полоса" );
-                ts.RunToConsole( "барсук" );
-                ts.RunToConsole( "карамель" );
-                ts.RunToConsole( "ебеммозгибезучетаконтекста" );
+                ts.Run_ToConsole( "бабушкакозликаоченьлюбила" );
+                ts.Run_ToConsole( "баб_ушкакозликаоченьлюбила" );
+                ts.Run_ToConsole( "вротебатьебатькопать" );
+                ts.Run_ToConsole( "волокно" );
+                ts.Run_ToConsole( "полоса" );
+                ts.Run_ToConsole( "барсук" );
+                ts.Run_ToConsole( "карамель" );
+                ts.Run_ToConsole( "ебеммозгибезучетаконтекста" );
 
                 //EN
-                ts.RunToConsole( "Itiseasytoreadwordswithoutspaces" ); // => "It is easy to read words without spaces"
+                ts.Run_ToConsole( "Itiseasytoreadwordswithoutspaces" ); // => "It is easy to read words without spaces"
             }
         }
         private static void Test__UnionTextSegmenter( UnionTextSegmenter uts )
         {
+            uts.RunBest_Debug_ToConsole( "Глокая куздра штеко будланула бокра и курдячит бокрёнка".NoWhiteSpace() );
+            uts.Run_Debug_ToConsole( "на поле он о вскомконом говорил".NoWhiteSpace() );
+            uts.RunBest_Debug_ToConsole( "наполеонсеяллен" );
+            uts.RunBest_ToConsole( "азатемоформилвсёэтоввидебиблиотекинаC++соswigбиндингамидлядругихязыков" );
+            uts.RunBest_ToConsole( "бабушкакозликаоченьлюбила" );
+            uts.RunBest_ToConsole( "баб_ушкакозликаоченьлюбила" );
+            uts.RunBest_ToConsole( "вротебатьебатькопать" );
+            uts.RunBest_ToConsole( "волокно" );
+            uts.RunBest_ToConsole( "полоса" );
+            uts.RunBest_ToConsole( "барсук" );
+            uts.RunBest_ToConsole( "карамель" );
+            uts.RunBest_ToConsole( "ебеммозгибезучетаконтекста" );
+            uts.RunBest_ToConsole( "наполеон" );
+            uts.RunBest_ToConsole( "Варкалось Хливкие шорьки Пырялись по наве И хрюкотали зелюки Как мюмзики в мове".NoWhiteSpace() );
+
+            //EN
+            uts.RunBest_ToConsole( "Textsegmentation" );
+            uts.RunBest_ToConsole( "Itiseasytoreadwordswithoutspaces" ); // => "It is easy to read words without spaces"
+            uts.RunBest_ToConsole( "The western yellow robin is a species of bird in the Australasian robin family native to Australia".NoWhiteSpace() );
+
+            //DE
+            uts.RunBest_Debug_ToConsole( "EsisteinfachWörterohneLeerzeichenzulesen" );
+            uts.RunBest_Offset_ToConsole( "In seinen Anfangsjahren trat er mit wirtschafts und siedlungsgeschichtlichen Arbeiten hervor".NoWhiteSpace() );
+            uts.RunBest_Offset_ToConsole( "MayersZielwardieErarbeitungeineseuropäischenGeschichtsbildes,dasvorallemvonderdeutschenGeschichtswissenschaftausbestimmtwird" );
+
+            /*
             const string TXT = "анаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеон" +
                                "анаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеон";
 
-            uts.RunToConsole( TXT );
             uts.Run4All( TXT ).ToConsole();
+            uts.Run4All( "наполеонсеяллен" ).ToConsole();
             uts.Run4All( "Textsegmentation" ).ToConsole();
-
-            uts.RunToConsole( "Textsegmentation" );
-            uts.RunToConsole( "азатемоформилвсёэтоввидебиблиотекинаC++соswigбиндингамидлядругихязыков" );
-
-            uts.RunToConsole( "бабушкакозликаоченьлюбила" );
-            uts.RunToConsole( "баб_ушкакозликаоченьлюбила" );
-            uts.RunToConsole( "вротебатьебатькопать" );
-            uts.RunToConsole( "волокно" );
-            uts.RunToConsole( "полоса" );
-            uts.RunToConsole( "барсук" );
-            uts.RunToConsole( "карамель" );
-            uts.RunToConsole( "ебеммозгибезучетаконтекста" );
-            uts.RunToConsole( "наполеон" );
-
-            //EN
-            uts.RunToConsole( "Itiseasytoreadwordswithoutspaces" ); // => "It is easy to read words without spaces"
+            //*/
         }
 
         //------------------------------------------------------------//
-        private static void GCCollect()
-        {
-            GC.Collect( GC.MaxGeneration, GCCollectionMode.Forced );
-            GC.WaitForPendingFinalizers();
-            GC.Collect( GC.MaxGeneration, GCCollectionMode.Forced );
-        }
-
-        private static void RunToConsole( this ITextSegmenter ts, string text )
+        private static void Run_ToConsole( this ITextSegmenter ts, string text )
         {
             Console.Write( $"'{text}' => " );
             ts.Run( text ).ToConsole();
         }
-        private static void RunToConsole_Offset( this ITextSegmenter ts, string text )
+        private static void Run_Debug_ToConsole( this ITextSegmenter ts, string text )
+        {
+            Console.Write( $"'{text}' => " );
+            ts.Run_Debug( text ).ToConsole();
+        }
+        private static void Run_Offset_ToConsole( this ITextSegmenter ts, string text )
         {
             Console.Write( $"'{text}' => " );
             ts.Run_Offset( text ).ToConsole( text );
@@ -252,18 +252,24 @@ namespace lingvo.ts.TestApp
         }
 
 
-        private static void RunToConsole( this UnionTextSegmenter uts, string text )
+        private static void RunBest_ToConsole( this UnionTextSegmenter uts, string text )
         {
             Console.Write( $"'{text}' => " );
             uts.RunBest( text ).ToConsole();
         }
-        private static void RunToConsole_Offset( this UnionTextSegmenter uts, string text )
+        private static void RunBest_Debug_ToConsole( this UnionTextSegmenter uts, string text )
+        {
+            Console.Write( $"'{text}' => " );
+            uts.RunBest_Debug( text ).ToConsole();
+        }
+        private static void RunBest_Offset_ToConsole( this UnionTextSegmenter uts, string text )
         {
             Console.Write( $"'{text}' => " );
             uts.RunBest_Offset( text ).ToConsole( text );
         }
-        private static void ToConsole( this _UResult_ r )
+        private static void ToConsole( this _UResult_ r )//, string text )
         {
+            //Console.Write( $"'{text}' => " );
             if ( r.TPS.AnyEx() )
             {
                 Console.WriteLine( '\'' + string.Join( " ", r.TPS.Select( t => t.Term ) ) + $"' ({r.Language})" );
@@ -303,5 +309,11 @@ namespace lingvo.ts.TestApp
 
 
         private static bool AnyEx< T >( this IEnumerable< T > seq ) => ((seq != null) && seq.Any());
+        private static TimeSpan StopAndElapsed( this Stopwatch sw )
+        {
+            sw.Stop();
+            return (sw.Elapsed);
+        }
+        private static string NoWhiteSpace( this string s ) => s.Replace( " ", "" );
     }
 }

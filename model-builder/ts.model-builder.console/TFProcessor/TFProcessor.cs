@@ -21,28 +21,29 @@ namespace lingvo.core.algorithm
     /// </summary>
     internal sealed class TermFrequency
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public sealed class Comparer : IComparer< TermFrequency >
+        {
+            public static Comparer Instance { get; } = new Comparer();
+            private Comparer() { }
+
+            public int Compare( TermFrequency x, TermFrequency y )
+            {
+                var d = y.Frequency - x.Frequency;
+                if ( d != 0 )
+                    return (d);
+
+                return (string.CompareOrdinal( x.Term, y.Term ));
+            }
+        }
+
         public string Term;
         public int    Frequency;
 #if DEBUG
         public override string ToString() => $"{Term}:{Frequency}";
 #endif
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    internal sealed class TermFrequencyComparer : IComparer<TermFrequency>
-    {
-        public static TermFrequencyComparer Instance { get; } = new TermFrequencyComparer();
-        private TermFrequencyComparer() { }
-
-        public int Compare( TermFrequency x, TermFrequency y )
-        {
-            var d = y.Frequency - x.Frequency;
-            if ( d != 0 )
-                return (d);
-
-            return (string.CompareOrdinal( x.Term, y.Term ));
-        }
     }
 
     /// <summary>
@@ -55,25 +56,29 @@ namespace lingvo.core.algorithm
         /// </summary>
         public struct TermProbability_t
         {
+            /// <summary>
+            /// 
+            /// </summary>
+            internal sealed class Comparer : IComparer< TermProbability_t >
+            {
+                public static Comparer Instance { get; } = new Comparer();
+                private Comparer() { }
+
+                public int Compare( TermProbability_t x, TermProbability_t y )
+                {
+                    var d = y.Probability.CompareTo( x.Probability );
+                    if ( d != 0 )
+                        return (d);
+
+                    return (string.CompareOrdinal( x.Term, y.Term ));
+                }
+            }
+
             public string Term;
             public double Probability;
 #if DEBUG
             public override string ToString() => $"{Term}: {Probability}"; 
 #endif
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        private struct TermProbabilityIComparer_t : IComparer< TermProbability_t >
-        {
-            public int Compare( TermProbability_t x, TermProbability_t y )
-            {
-                var d = y.Probability.CompareTo( x.Probability );
-                if ( d != 0 )
-                    return (d);
-
-                return (string.CompareOrdinal( x.Term, y.Term ));
-            }
         }
 
         /// <summary>
@@ -81,25 +86,29 @@ namespace lingvo.core.algorithm
         /// </summary>
         private struct TermFrequency_t
         {
+            /// <summary>
+            /// 
+            /// </summary>
+            internal sealed class Comparer : IComparer< TermFrequency_t >
+            {
+                public static Comparer Instance { get; } = new Comparer();
+                private Comparer() { }
+
+                public int Compare( TermFrequency_t x, TermFrequency_t y )
+                {
+                    var d = y.Frequency - x.Frequency;
+                    if ( d != 0 )
+                        return (d);
+
+                    return (string.CompareOrdinal( x.Term, y.Term ));
+                }
+            }
+
             public string Term;
             public int    Frequency;
 #if DEBUG
             public override string ToString() => $"{Term}: {Frequency}"; 
 #endif
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        private struct TermFrequencyIComparer_t : IComparer< TermFrequency_t >
-        {
-            public int Compare( TermFrequency_t x, TermFrequency_t y )
-            {
-                var d = y.Frequency - x.Frequency;
-                if ( d != 0 )
-                    return (d);
-
-                return (string.CompareOrdinal( x.Term, y.Term ));
-            }
         }
 
         private TFProcessor() { }
@@ -110,42 +119,34 @@ namespace lingvo.core.algorithm
         public int TotalWordCount => _TotalWordCount;
         public int DictionarySize => _TermFrequency.Count;
 
-        [M(O.AggressiveInlining)]
-        public void AddTerm( string term )
+        [M(O.AggressiveInlining)] public void AddTerm( string term )
         {
             _TermFrequency.AddOrUpdate( term );
             _TotalWordCount++;
         }
 
         #region [.begin-end add terms.]
-        [M(O.AggressiveInlining)]
-        public void BeginAddDocumentTerms() { }
-
-        [M(O.AggressiveInlining)]
-        public void AddDocumentTerms( Dictionary< string, int > dict )
+        [M(O.AggressiveInlining)] public void BeginAddDocumentTerms() { }
+        [M(O.AggressiveInlining)] public void AddDocumentTerms( Dictionary< string, int > dict )
         {
             foreach ( var p in dict )
             {
                 _TermFrequency.AddOrUpdate( p.Key, p.Value );
             }            
         }
-
-        [M(O.AggressiveInlining)]
-        public void AddDocumentTerms( SortedSet< TermFrequency > ss )
+        [M(O.AggressiveInlining)] public void AddDocumentTerms( SortedSet< TermFrequency > ss )
         {
             foreach ( var tf in ss )
             {
                 _TermFrequency.AddOrUpdate( tf.Term, tf.Frequency );
             }      
         }
-
-        [M(O.AggressiveInlining)]
-        public void EndAddDocumentTerms( int documentWordCount ) => _TotalWordCount += documentWordCount;
+        [M(O.AggressiveInlining)] public void EndAddDocumentTerms( int documentWordCount ) => _TotalWordCount += documentWordCount;
         #endregion
 
         private Dictionary< string, double > CalcProbabilityWithCut( float leavePercent )
         {
-            var ss = new SortedSet< TermFrequency_t >( default(TermFrequencyIComparer_t) );
+            var ss = new SortedSet< TermFrequency_t >( TermFrequency_t.Comparer.Instance );
             var sum = 0;
             foreach ( var p in _TermFrequency )
             {
@@ -173,7 +174,7 @@ namespace lingvo.core.algorithm
         }
         public SortedSet< TermProbability_t > CalcProbabilityOrdered( float? cutPercent = null )
         {
-            var ss = new SortedSet< TermProbability_t >( default(TermProbabilityIComparer_t) );
+            var ss = new SortedSet< TermProbability_t >( TermProbability_t.Comparer.Instance );
 
             if ( cutPercent.HasValue )
             {
@@ -199,7 +200,7 @@ namespace lingvo.core.algorithm
 
         public static SortedSet< TermFrequency > CreateSortedSetAndCutIfNeed( IEnumerable< TermFrequency > tfs, float? cutPercent, int sum )
         {
-            var ss = new SortedSet< TermFrequency >( TermFrequencyComparer.Instance );
+            var ss = new SortedSet< TermFrequency >( TermFrequency.Comparer.Instance );
 
             if ( cutPercent.HasValue )
             {
@@ -229,7 +230,7 @@ namespace lingvo.core.algorithm
         }
         public static SortedSet< TermFrequency > CreateSortedSetAndCutIfNeed( IEnumerable< TermFrequency > tfs )
         {
-            var ss = new SortedSet< TermFrequency >( TermFrequencyComparer.Instance );
+            var ss = new SortedSet< TermFrequency >( TermFrequency.Comparer.Instance );
             foreach ( var word in tfs )
             {
                 ss.Add( word );
@@ -238,37 +239,6 @@ namespace lingvo.core.algorithm
         }
 
         public static TFProcessor Create( int capacity ) => new TFProcessor() { _TermFrequency = new Dictionary< string, int >( capacity ) };
-
-        public static void CutDictionaryIfNeed( Dictionary< string, int > dict, float? cutPercent = null )
-        {
-            if ( cutPercent.HasValue )
-            {
-                var ss = new SortedSet< TermFrequency_t >( default(TermFrequencyIComparer_t) );
-                var sum = 0;
-                foreach ( var p in dict )
-                {
-                    sum += p.Value;
-                    ss.Add( new TermFrequency_t() { Term = p.Key, Frequency = p.Value } );
-                }
-
-                var leavePercent      = 100 - cutPercent.Value;
-                var threshold         = sum * leavePercent / 100.0;
-                var threshold_current = 0;
-
-                dict.Clear();
-                foreach ( var tf in ss )
-                {
-                    threshold_current += tf.Frequency;
-                    if ( threshold < threshold_current )
-                    {
-                        break;
-                    }
-
-                    dict.Add( tf.Term, tf.Frequency );
-                }
-                ss = null;
-            }
-        }
     }
 
     /// <summary>
@@ -276,8 +246,7 @@ namespace lingvo.core.algorithm
     /// </summary>
     internal static class Extensions
     {
-        [M(O.AggressiveInlining)]
-        public static void AddOrUpdate( this Dictionary< string, int > dict, string key )
+        [M(O.AggressiveInlining)] public static void AddOrUpdate( this Dictionary< string, int > dict, string key )
         {
             if ( dict.TryGetValue( key, out var count ) )
             {
@@ -288,9 +257,7 @@ namespace lingvo.core.algorithm
                 dict.Add( key, 1 );
             }
         }
-
-        [M(O.AggressiveInlining)]
-        public static void AddOrUpdate( this Dictionary< string, int > dict, string key, int countValue )
+        [M(O.AggressiveInlining)] public static void AddOrUpdate( this Dictionary< string, int > dict, string key, int countValue )
         {
             if ( dict.TryGetValue( key, out var count ) )
             {
@@ -299,24 +266,6 @@ namespace lingvo.core.algorithm
             else
             {
                 dict.Add( key, countValue );
-            }
-        }
-
-        [M(O.AggressiveInlining)]
-        public static void Append( this Dictionary< string, int > dict, IList< string > words )
-        {
-            foreach ( var word in words )
-            {
-                dict.AddOrUpdate( word );
-            }
-        }
-
-        [M(O.AggressiveInlining)]
-        public static void AppendDictionary( this Dictionary< string, int > masterDict, Dictionary< string, int > slaveDict )
-        {
-            foreach ( var p in slaveDict )
-            {
-                masterDict.AddOrUpdate( p.Key, p.Value );
             }
         }
     }

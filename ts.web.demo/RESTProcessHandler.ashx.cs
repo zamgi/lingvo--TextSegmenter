@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
 using Newtonsoft.Json;
@@ -51,10 +52,7 @@ namespace lingvo.ts
                 [JsonProperty(PropertyName="lang")] public string        lang       { get; set; }
             }
 
-            public result( Exception ex ) : this()
-            {
-                exception_message = ex.ToString();
-            }
+            public result( Exception ex ) : this() => exception_message = ex.ToString();
             public result( ICollection< tuple_TermProbability_Offset > termProbsByRows ) : this()
             {
                 term_probs_by_rows = (from x in termProbsByRows
@@ -88,66 +86,7 @@ namespace lingvo.ts
         /// </summary>
         private struct processing_context
         {
-            private static readonly object _SyncLock = new object();
-
-            //public processing_context( language language )
-            //{
-            //    switch ( language )
-            //    {
-            //        case language.en : GetConcurrentFactory = GetConcurrentFactory_EN; break;
-            //        case language.ru : GetConcurrentFactory = GetConcurrentFactory_RU; break;
-            //        case language.any: GetConcurrentFactory = null; break;
-            //        default:
-            //            throw (new ArgumentException( language.ToString() ));
-            //    }
-            //}
-
-            //public Func< ConcurrentFactory > GetConcurrentFactory;
-
-            //private static ConcurrentFactory _ConcurrentFactory_RU;
-            //private static ConcurrentFactory _ConcurrentFactory_EN;
-
-            //public static ConcurrentFactory GetConcurrentFactory_RU()
-            //{
-            //    var f = _ConcurrentFactory_RU;
-            //    if ( f == null )
-            //    {
-            //        lock ( _SyncLock )
-            //        {
-            //            f = _ConcurrentFactory_RU;
-            //            if ( f == null )
-            //            {
-            //                var model = new NativeTextMMFModelBinary( Config.Inst.GetBinaryModelConfig_RU() );
-
-            //                f = new ConcurrentFactory( model, Config.Inst.CONCURRENT_FACTORY_INSTANCE_COUNT );
-            //                _ConcurrentFactory_RU = f;
-            //                //GC.KeepAlive( _ConcurrentFactory_RU );
-            //            }
-            //        }
-            //    }
-            //    return (f);
-            //}
-            //public static ConcurrentFactory GetConcurrentFactory_EN()
-            //{
-            //    var f = _ConcurrentFactory_EN;
-            //    if ( f == null )
-            //    {
-            //        lock ( _SyncLock )
-            //        {
-            //            f = _ConcurrentFactory_EN;
-            //            if ( f == null )
-            //            {
-            //                var model = new NativeTextMMFModelBinary( Config.Inst.GetBinaryModelConfig_EN() );
-
-            //                f = new ConcurrentFactory( model, Config.Inst.CONCURRENT_FACTORY_INSTANCE_COUNT );                            
-            //                _ConcurrentFactory_EN = f;
-            //                //GC.KeepAlive( _ConcurrentFactory_EN );
-            //            }
-            //        }
-            //    }
-            //    return (f);
-            //}
-
+            private static readonly object _SyncLock = new object();     
             private static ConcurrentFactory _ConcurrentFactory;
 
             private static _UInitParam_[] LoadModels()
@@ -155,8 +94,20 @@ namespace lingvo.ts
                 var ps = new List< _UInitParam_ >( Enum.GetValues( typeof(_ULanguage_) ).Length );
                 try
                 {
-                    ps.Add( _UInitParam_.Create( new NativeTextMMFModelBinary( Config.Inst.GetBinaryModelConfig_RU() ), _ULanguage_.RU ) );
-                    ps.Add( _UInitParam_.Create( new NativeTextMMFModelBinary( Config.Inst.GetBinaryModelConfig_EN() ), _ULanguage_.EN ) );
+                    var funcs = new Func< _UInitParam_ >[] 
+                    { 
+                        () => _UInitParam_.Create( new NativeTextMMFModelBinary( Config.Inst.GetBinaryModelConfig_RU() ), _ULanguage_.RU ), 
+                        () => _UInitParam_.Create( new NativeTextMMFModelBinary( Config.Inst.GetBinaryModelConfig_EN() ), _ULanguage_.EN ),
+                        () => _UInitParam_.Create( new NativeTextMMFModelBinary( Config.Inst.GetBinaryModelConfig_DE() ), _ULanguage_.DE )
+                    };
+                    Parallel.ForEach( funcs, func =>
+                    {
+                        var res = func();
+                        lock ( ps )
+                        {
+                            ps.Add( res );
+                        }
+                    });
                     return (ps.ToArray());
                 }
                 catch ( Exception ex )
@@ -178,9 +129,7 @@ namespace lingvo.ts
                         {
                             var ps = LoadModels();
 
-                            f = new ConcurrentFactory( Config.Inst.CONCURRENT_FACTORY_INSTANCE_COUNT, ps );
-                            _ConcurrentFactory = f;
-                            //GC.KeepAlive( _ConcurrentFactory );
+                            _ConcurrentFactory = f = new ConcurrentFactory( Config.Inst.CONCURRENT_FACTORY_INSTANCE_COUNT, ps );
                         }
                     }
                 }
@@ -192,7 +141,6 @@ namespace lingvo.ts
         static RESTProcessHandler() => Environment.CurrentDirectory = HttpContext.Current.Server.MapPath( "~/" );
 
         public bool IsReusable => true;
-
         public void ProcessRequest( HttpContext context )
         {
             #region [.log.]
@@ -256,15 +204,12 @@ namespace lingvo.ts
             }
             return (value);
         }
-        public static T GetRequestEnumParam< T >( this HttpContext context, string paramName ) 
-            where T : struct => ((T) Enum.Parse( typeof(T), context.Request[ paramName ], true ));
-        public static T? TryGetRequestEnumParam< T >( this HttpContext context, string paramName ) 
-            where T : struct => (Enum.TryParse< T >( context.Request[ paramName ], true, out var t ) ? t : ((T?) null));
+        public static T GetRequestEnumParam< T >( this HttpContext context, string paramName ) where T : struct => ((T) Enum.Parse( typeof(T), context.Request[ paramName ], true ));
+        public static T? TryGetRequestEnumParam< T >( this HttpContext context, string paramName ) where T : struct => (Enum.TryParse< T >( context.Request[ paramName ], true, out var t ) ? t : ((T?) null));
 
         public static void ToJson( this HttpResponse response, ICollection< RESTProcessHandler.result.tuple_TermProbability_Offset > termProbsByRows ) => 
             response.ToJson( new RESTProcessHandler.result( termProbsByRows ) );
-        public static void ToJson( this HttpResponse response, Exception ex ) => 
-            response.ToJson( new RESTProcessHandler.result( ex ) );
+        public static void ToJson( this HttpResponse response, Exception ex ) => response.ToJson( new RESTProcessHandler.result( ex ) );
         public static void ToJson( this HttpResponse response, RESTProcessHandler.result result )
         {
             response.ContentType = "application/json";

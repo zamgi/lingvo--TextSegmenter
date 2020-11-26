@@ -28,7 +28,7 @@ namespace lingvo.ts
             ModelDictionaryCapacity = modelDictionaryCapacity;
         }
 
-        public string ModelFilename           { get; private set; }
+        public string ModelFilename           { get; }
         public int    ModelDictionaryCapacity { get; set; }
 
         public IEnumerable< KeyValuePair< string, float > > GetModelFileContent()

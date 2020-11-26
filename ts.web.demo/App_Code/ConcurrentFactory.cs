@@ -14,7 +14,6 @@ namespace lingvo.ts
     /// </summary>
 	internal sealed class ConcurrentFactory
     {
-		private readonly int                          _InstanceCount;		
 		private Semaphore                             _Semaphore;
         private ConcurrentStack< UnionTextSegmenter > _Stack;
 
@@ -23,7 +22,6 @@ namespace lingvo.ts
             if ( ps == null || !ps.Any() ) throw (new ArgumentNullException( "ps" ));
             if ( instanceCount <= 0 )      throw (new ArgumentException( "instanceCount" ));
 
-            _InstanceCount = instanceCount;
             _Semaphore     = new Semaphore( instanceCount, instanceCount );
             _Stack         = new ConcurrentStack< UnionTextSegmenter >();
 			for ( int i = 0; i < instanceCount; i++ )
@@ -44,7 +42,7 @@ namespace lingvo.ts
 			}
 			finally
 			{
-                if ( !worker.Equals( default(UnionTextSegmenter) ) )
+                if ( worker != null )
 				{
                     _Stack.Push( worker );
 				}
@@ -52,7 +50,6 @@ namespace lingvo.ts
 			}
 			return (result);
 		}
-
         public _UResultOffset_ Run_Offset( string text, _ULanguage_ lang )
 		{
             _Semaphore.WaitOne();
@@ -66,8 +63,8 @@ namespace lingvo.ts
             }
 			finally
 			{
-                if ( !worker.Equals( default(UnionTextSegmenter) ) )
-				{
+                if ( worker != null )
+                {
                     _Stack.Push( worker );
 				}
 				_Semaphore.Release();

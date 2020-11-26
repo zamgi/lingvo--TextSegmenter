@@ -20,11 +20,7 @@ namespace lingvo.core
             _CHARTYPE_MAP        = xlat_Unsafe.Inst._CHARTYPE_MAP;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [M(O.AggressiveInlining)]
-        public static string ToUpperInvariant( string value )
+        [M(O.AggressiveInlining)] public static string ToUpperInvariant( string value )
         {
             var len = value.Length;
             if ( 0 < len )
@@ -42,10 +38,6 @@ namespace lingvo.core
             }
             return (string.Empty);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
         [M(O.AggressiveInlining)] public static string ToUpperInvariant( string value, out bool isNullOrWhiteSpace )
         {
             isNullOrWhiteSpace = true;
@@ -69,7 +61,6 @@ namespace lingvo.core
             }
             return (string.Empty);
         }
-
         [M(O.AggressiveInlining)] public static void   ToUpperInvariant( char* wordFrom, char* bufferTo )
         {
             for ( ; ; wordFrom++, bufferTo++ )
@@ -89,7 +80,6 @@ namespace lingvo.core
                 ToUpperInvariantInPlace( value_ptr );
             }
         }
-
         [M(O.AggressiveInlining)] public static void   ToUpperInvariantInPlace( char* word )
         {
             for ( ; ; word++ )
@@ -119,7 +109,6 @@ namespace lingvo.core
                 *word = *(_UPPER_INVARIANT_MAP + ch);
             }
         }
-
         [M(O.AggressiveInlining)] public static void   ToUpperInvariantInPlace( char* word, int length )
         {
             for ( length--; 0 <= length; length-- )
@@ -129,7 +118,6 @@ namespace lingvo.core
         }
 
         [M(O.AggressiveInlining)] public static string ToLowerInvariant( string value ) => value.ToLowerInvariant();
-
 
         /// проверка эквивалентности строк
         [M(O.AggressiveInlining)] public static bool IsEqual( string first, string second )
@@ -184,7 +172,6 @@ namespace lingvo.core
             }
             return (true);
         }
-
         [M(O.AggressiveInlining)] public static bool IsEqual( string first, int firstIndex, string second )
         {
             int length = first.Length - firstIndex;
@@ -236,7 +223,6 @@ namespace lingvo.core
             }
             return (true);
         }
-
         [M(O.AggressiveInlining)] public static bool IsEqual( IntPtr x, IntPtr y )
         {
             if ( x == y )

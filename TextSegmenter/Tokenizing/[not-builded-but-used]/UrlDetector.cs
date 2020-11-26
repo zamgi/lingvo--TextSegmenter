@@ -83,10 +83,7 @@ namespace lingvo.urls
 
             xdoc = null;
         }
-        public UrlDetectorModel( IEnumerable< string > firstLevelDomains, IEnumerable< string > uriSchemes )
-        {
-            Initialize( firstLevelDomains, uriSchemes );
-        }
+        public UrlDetectorModel( IEnumerable< string > firstLevelDomains, IEnumerable< string > uriSchemes ) => Initialize( firstLevelDomains, uriSchemes );
 
         private void Initialize( IEnumerable< string > firstLevelDomains, IEnumerable< string > uriSchemes )
         {
@@ -97,26 +94,10 @@ namespace lingvo.urls
             URIschemesMaxLength       = URIschemes.GetItemMaxLength_4Urls();
         }
 
-        public HashSet< string > FirstLevelDomains
-        { 
-            get; 
-            private set; 
-        }
-        public int               FirstLevelDomainsMaxLength
-        {
-            get;
-            private set;
-        }
-        public HashSet< string > URIschemes
-        { 
-            get; 
-            private set; 
-        }
-        public int               URIschemesMaxLength
-        {
-            get;
-            private set;
-        }
+        public HashSet< string > FirstLevelDomains          { get; private set; }
+        public int               FirstLevelDomainsMaxLength { get; private set; }
+        public HashSet< string > URIschemes                 { get; private set; }
+        public int               URIschemesMaxLength        { get; private set; }
     }
 
     /// <summary>
@@ -124,24 +105,11 @@ namespace lingvo.urls
     /// </summary>
     public class UrlDetectorConfig
     {
-        public UrlDetectorConfig()
-        {
-        }
-        public UrlDetectorConfig( string urlDetectorResourcesXmlFilename )
-        {
-            Model = new UrlDetectorModel( urlDetectorResourcesXmlFilename );
-        }
+        public UrlDetectorConfig() { }
+        public UrlDetectorConfig( string urlDetectorResourcesXmlFilename ) => Model = new UrlDetectorModel( urlDetectorResourcesXmlFilename );
 
-        public UrlDetectorModel Model
-        {
-            get;
-            set;
-        }
-        public UrlDetector.UrlExtractModeEnum UrlExtractMode
-        {
-            get;
-            set;
-        }
+        public UrlDetectorModel Model { get; set; }
+        public UrlDetector.UrlExtractModeEnum UrlExtractMode { get; set; }
     }
 
     /// <summary>
@@ -212,10 +180,7 @@ namespace lingvo.urls
             _UriSchBufferPtrBase      = (char*) _URIschemesBufferGCHandle.AddrOfPinnedObject().ToPointer();
         }
 
-        ~UrlDetector()
-        {
-            DisposeNativeResources();
-        }
+        ~UrlDetector() => DisposeNativeResources();
         public void Dispose()
         {
             DisposeNativeResources();

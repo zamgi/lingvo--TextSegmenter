@@ -27,10 +27,10 @@ h2, h3 { font-weight: bold; text-align:center; }
 .h-head { margin-top:0; }
 h2.h-head { font-size:18px; background:#E6E6E6; line-height:30px; padding-left:7px; font-weight:normal; margin-bottom:3px; }
 
-#wrapper { margin:20px auto; width:1004px; overflow:hidden; border: 1px solid silver; border-top-color: #e0e0e0; border-radius: 3px; }
+#wrapper { margin:0 auto 20px auto; width:1200px; overflow:hidden; border: 1px solid silver; border-top-color: #e0e0e0; border-radius: 3px; }
 #superMainWrapper { background-color: #f3f3f3; }
 #mainWrapper { width:100%; position:relative; }
-#main { width:956px; position:relative; right: -6px; padding: 20px 18px;}
+#main {padding: 5px 18px 20px 18px;}
 
 #processButton {background-color: black;color: white; width: 220px;}
     #processButton:hover { background-color: #252525; }
@@ -50,10 +50,10 @@ h2.h-head { font-size:18px; background:#E6E6E6; line-height:30px; padding-left:7
 #mainPageContent {width: 100%;}
 #mainPageContent a {text-decoration: none;}
 #mainPageContent a:hover {text-decoration: underline;}
-.main-header {background: none; margin-top: 15px; margin-bottom: 15px; text-align: center; font-size: 15px; font-weight: normal;}
-#periodsHeader {padding: 7px; border-radius: 3px; }
+.main-header {background: none; text-align: center; font-size: 15px; font-weight: normal;}
+#periodsHeader {padding: 3px; border-radius: 3px; }
 .description-header {font-size: 0.8em; float:right;}
-#text {padding: 5px 15px; resize: none; border: 1px solid silver; border-radius: 3px; height: 150px; width: 716px;}
+#text {padding: 5px 15px; resize: none; border: 1px solid silver; border-radius: 3px; height: 150px; width: 800px;}
 .result-info {width: 630px; min-height: 20px; margin: 10px auto; text-align: center; color: #313131;}
 .result-info.error {color: #f00;}
 #processResult table {width: 100%; margin: 0 auto;}
@@ -70,7 +70,7 @@ h2.h-head { font-size:18px; background:#E6E6E6; line-height:30px; padding-left:7
         font-style: italic;
     }
     #processResult table td:nth-child(2) {
-        width: 1px;
+        width: 40%;
         text-align: right;
     }
     #processResult table td:nth-child(3) {
@@ -78,7 +78,7 @@ h2.h-head { font-size:18px; background:#E6E6E6; line-height:30px; padding-left:7
         text-align: center;
     }
     #processResult table td:nth-child(4) {
-        width: 100%;
+        width: 60%;
         text-align: left;
     }
     #processResult table td.RU { color: darkgreen; }
