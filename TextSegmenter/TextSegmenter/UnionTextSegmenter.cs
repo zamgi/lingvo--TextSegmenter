@@ -284,11 +284,26 @@ namespace lingvo.ts
                 res[ i ] = (result, prob);
             }
 
-            for ( var i = res.Length - 1; 0 <= i; i-- )
+            for ( int len = res.Length - 1, i = len; 0 <= i; i-- )
             {
                 ref var t = ref res[ i ];
-                t.prob = 1 - (t.prob / sum);
+                //t.prob /= sum;
+                //
+                t.prob = (1 - (t.prob / sum));// / len;
             }
+
+            //sum = 0;
+            //for ( var i = res.Length - 1; 0 <= i; i-- )
+            //{
+            //    ref var t = ref res[ i ];
+            //    t.prob = Math.Exp( -t.prob );
+            //    sum += t.prob;
+            //}
+            //for ( var i = res.Length - 1; 0 <= i; i-- )
+            //{
+            //    ref var t = ref res[ i ];
+            //    t.prob /= sum;
+            //}
 
             //---PutToInterval( res );
 

@@ -184,7 +184,8 @@ namespace lingvo.ts.TestApp
             uts.Run4All( "EsisteinfachWörterohneLeerzeichenzulesen" ).ToConsole();
             uts.Run4All( "In seinen Anfangsjahren trat er mit wirtschafts und siedlungsgeschichtlichen Arbeiten hervor".NoWhiteSpace() ).ToConsole();
             uts.Run4All( "MayersZielwardieErarbeitungeineseuropäischenGeschichtsbildes,dasvorallemvonderdeutschenGeschichtswissenschaftausbestimmtwird" ).ToConsole();
-
+            uts.Run4All( "dasistfantastisch" ).ToConsole();
+            uts.Run4All( "Глокая куздра штеко будланула бокра и курдячит бокрёнка".NoWhiteSpace() ).ToConsole();
 
             uts.RunBest_Debug_ToConsole( "Глокая куздра штеко будланула бокра и курдячит бокрёнка".NoWhiteSpace() );
             uts.Run_Debug_ToConsole( "на поле он о вскомконом говорил".NoWhiteSpace() );
