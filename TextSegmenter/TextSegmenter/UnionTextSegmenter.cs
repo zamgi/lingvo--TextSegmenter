@@ -271,6 +271,7 @@ namespace lingvo.ts
         public IReadOnlyCollection< (Result r, double prob) > Run4All( string text )
         {
             var res = new (Result r, double prob)[ _TextSegmenters.Length ];
+            var sum = 0.0;
 
             for ( var i = _TextSegmenters.Length - 1; 0 <= i; i-- )
             {
@@ -278,14 +279,22 @@ namespace lingvo.ts
                 var result = Result.Create( tps, _Languages[ i ] );
                 var prob   = tps.Sum( tp => Math.Log( tp.Probability ) ).N();
 
+                sum += prob;
+
                 res[ i ] = (result, prob);
             }
 
-            PutToInterval( res );
+            for ( var i = res.Length - 1; 0 <= i; i-- )
+            {
+                ref var t = ref res[ i ];
+                t.prob = 1 - (t.prob / sum);
+            }
+
+            //---PutToInterval( res );
 
             return (res);
         }
-        private static void PutToInterval( (Result r, double prob)[] res )
+        /*private static void PutToInterval( (Result r, double prob)[] res )
         {
             double min = res.Min( t => t.prob );
             double max = res.Max( t => t.prob );
@@ -301,7 +310,7 @@ namespace lingvo.ts
 
                 t.prob = (t.prob - min) * coef + new_min;
             }
-        }
+        }*/
     }
 
     /// <summary>

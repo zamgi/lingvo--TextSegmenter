@@ -177,6 +177,15 @@ namespace lingvo.ts.TestApp
         }
         private static void Test__UnionTextSegmenter( UnionTextSegmenter uts )
         {
+            uts.Run4All( "бабушкакозликаоченьлюбила" ).ToConsole();
+            uts.Run4All( "Textsegmentation" ).ToConsole();
+            uts.Run4All( "Itiseasytoreadwordswithoutspaces" ).ToConsole();
+            uts.Run4All( "The western yellow robin is a species of bird in the Australasian robin family native to Australia".NoWhiteSpace() ).ToConsole();
+            uts.Run4All( "EsisteinfachWörterohneLeerzeichenzulesen" ).ToConsole();
+            uts.Run4All( "In seinen Anfangsjahren trat er mit wirtschafts und siedlungsgeschichtlichen Arbeiten hervor".NoWhiteSpace() ).ToConsole();
+            uts.Run4All( "MayersZielwardieErarbeitungeineseuropäischenGeschichtsbildes,dasvorallemvonderdeutschenGeschichtswissenschaftausbestimmtwird" ).ToConsole();
+
+
             uts.RunBest_Debug_ToConsole( "Глокая куздра штеко будланула бокра и курдячит бокрёнка".NoWhiteSpace() );
             uts.Run_Debug_ToConsole( "на поле он о вскомконом говорил".NoWhiteSpace() );
             uts.RunBest_Debug_ToConsole( "наполеонсеяллен" );
@@ -201,6 +210,7 @@ namespace lingvo.ts.TestApp
             uts.RunBest_Debug_ToConsole( "EsisteinfachWörterohneLeerzeichenzulesen" );
             uts.RunBest_Offset_ToConsole( "In seinen Anfangsjahren trat er mit wirtschafts und siedlungsgeschichtlichen Arbeiten hervor".NoWhiteSpace() );
             uts.RunBest_Offset_ToConsole( "MayersZielwardieErarbeitungeineseuropäischenGeschichtsbildes,dasvorallemvonderdeutschenGeschichtswissenschaftausbestimmtwird" );
+            uts.RunBest_Offset_ToConsole( "dasistfantastisch" );
 
             /*
             const string TXT = "анаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеоннаполеон" +
@@ -284,7 +294,7 @@ namespace lingvo.ts.TestApp
             if ( res.AnyEx() )
             {
                 Console.WriteLine( "-------------------------------------" );
-                foreach ( var t in res )
+                foreach ( var t in res.OrderByDescending( t => t.prop ) )
                 {
                     Console.WriteLine( '\'' + string.Join( " ", t.r.TPS.Select( tp => tp.Term ) ) + $"' ({t.r.Language})  {t.prop * 100:N2}%" );
                 }
