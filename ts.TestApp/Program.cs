@@ -290,14 +290,14 @@ namespace lingvo.ts.TestApp
                 Console.WriteLine( "EMPTY" ); 
             }
         }
-        private static void ToConsole( this IReadOnlyCollection< (_UResult_ r, double prop) > res )
+        private static void ToConsole( this IReadOnlyCollection< (double prop, _UResult_ r) > res )
         {
             if ( res.AnyEx() )
             {
                 Console.WriteLine( "-------------------------------------" );
                 foreach ( var t in res.OrderByDescending( t => t.prop ) )
                 {
-                    Console.WriteLine( '\'' + string.Join( " ", t.r.TPS.Select( tp => tp.Term ) ) + $"' ({t.r.Language})  {t.prop * 100:N2}%" );
+                    Console.WriteLine( $"({t.r.Language})  {t.prop * 100:N2}%  '" + string.Join( " ", t.r.TPS.Select( tp => tp.Term ) ) + '\'' );
                 }
                 Console.WriteLine( "-------------------------------------" );
             }

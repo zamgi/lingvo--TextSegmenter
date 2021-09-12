@@ -47,6 +47,7 @@ namespace lingvo.ts
             public IReadOnlyList< TermProbability > TPS { get; private set; }
 
             public static Result Create( IReadOnlyList< TermProbability > tps, LanguageEnum lang ) => new Result() { TPS = tps, Language = lang };
+            public override string ToString() => $"'{Language}', ({string.Join( ", ", TPS )})";
         }
         /// <summary>
         /// 
@@ -267,11 +268,10 @@ namespace lingvo.ts
             #endregion
         }
 
-
-        public IReadOnlyCollection< (Result r, double prob) > Run4All( string text )
+        public IReadOnlyCollection< (double prob, Result r) > Run4All( string text )
         {
-            var res = new (Result r, double prob)[ _TextSegmenters.Length ];
-            var sum = 0.0;
+            var res = new (double prob, Result r)[ _TextSegmenters.Length ];
+            var prob_min = double.MaxValue;
 
             for ( var i = _TextSegmenters.Length - 1; 0 <= i; i-- )
             {
@@ -279,53 +279,34 @@ namespace lingvo.ts
                 var result = Result.Create( tps, _Languages[ i ] );
                 var prob   = tps.Sum( tp => Math.Log( tp.Probability ) ).N();
 
-                sum += prob;
+                res[ i ] = (prob, result);
 
-                res[ i ] = (result, prob);
+                if ( prob < prob_min )
+                {
+                    prob_min = prob;
+                }
             }
 
+            prob_min = Math.Abs( prob_min );
+            var exps_sum = 0.0;
             for ( int len = res.Length - 1, i = len; 0 <= i; i-- )
             {
                 ref var t = ref res[ i ];
-                //t.prob /= sum;
-                //
-                t.prob = (1 - (t.prob / sum));// / len;
+
+                var exp = Math.Exp( t.prob / prob_min );
+                t.prob = exp;
+                exps_sum += exp;
             }
-
-            //sum = 0;
-            //for ( var i = res.Length - 1; 0 <= i; i-- )
-            //{
-            //    ref var t = ref res[ i ];
-            //    t.prob = Math.Exp( -t.prob );
-            //    sum += t.prob;
-            //}
-            //for ( var i = res.Length - 1; 0 <= i; i-- )
-            //{
-            //    ref var t = ref res[ i ];
-            //    t.prob /= sum;
-            //}
-
-            //---PutToInterval( res );
-
-            return (res);
-        }
-        /*private static void PutToInterval( (Result r, double prob)[] res )
-        {
-            double min = res.Min( t => t.prob );
-            double max = res.Max( t => t.prob );
-
-            double new_min = 0.01;
-            double new_max = 0.99;
-
-            double coef = (new_max - new_min) / (max - min); // коэффициент пересчёта
-
-            for ( var i = 0; i < res.Length; i++ )
+            
+            for ( int len = res.Length - 1, i = len; 0 <= i; i-- )
             {
                 ref var t = ref res[ i ];
 
-                t.prob = (t.prob - min) * coef + new_min;
+                t.prob /= exps_sum;
             }
-        }*/
+
+            return (res);
+        }
     }
 
     /// <summary>
