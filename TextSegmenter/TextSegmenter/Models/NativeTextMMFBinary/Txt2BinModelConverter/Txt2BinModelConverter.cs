@@ -106,12 +106,12 @@ namespace lingvo.ts.modelconverter
                                     if ( bufferSize < idx )
                                     {
 #if DEBUG
-                                            var _ = lingvo.core.StringsHelper.ToString( tempBufferCharPtr, idx );
-                                            Console.Write( "\r\n'" );
-                                            Console.Write( _ );
-                                            Console.WriteLine( '\'' );
+                                        var _ = lingvo.core.StringsHelper.ToString( tempBufferCharPtr, idx );
+                                        Console.Write( "\r\n'" );
+                                        Console.Write( _ );
+                                        Console.WriteLine( '\'' );
 #endif
-                                            throw (new InvalidDataException( $"WTF?!?! - buffer size is too small: [{bufferSize} < idx]" ));
+                                        throw (new InvalidDataException( $"WTF?!?! - buffer size is too small: [{bufferSize} < idx]" ));
                                     }
                                     var ch = ngramPtr[ idx ];
                                     tempBufferCharPtr[ idx ] = ch;

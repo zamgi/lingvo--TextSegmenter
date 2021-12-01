@@ -13,6 +13,7 @@
     <RootNamespace>lingvo.ts</RootNamespace>
     <AssemblyName>ts.web.demo</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <SccProjectName>
     </SccProjectName>
     <SccLocalPath>
@@ -92,13 +93,13 @@
     <Compile Include="App_Code\Config.cs" />
     <Compile Include="App_Code\Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RESTProcessHandler.ashx.cs">
-      <DependentUpon>RESTProcessHandler.ashx</DependentUpon>
+    <Compile Include="ProcessHandler.ashx.cs">
+      <DependentUpon>ProcessHandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="App_Code\ConcurrentFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="RESTProcessHandler.ashx" />
+    <Content Include="ProcessHandler.ashx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="[resources-4-appharbor.com]\language-raw-source-data\drive.google.com.url" />

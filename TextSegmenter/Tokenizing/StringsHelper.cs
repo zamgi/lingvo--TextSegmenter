@@ -321,20 +321,6 @@ namespace lingvo.core
         [M(O.AggressiveInlining)] public static string ToString( IntPtr value ) => ToString( (char*) value );
         [M(O.AggressiveInlining)] public static string ToString( IntPtr value, int length ) => ToString( (char*) value, length );
 
-        [M(O.AggressiveInlining)] public static IntPtr AllocHGlobalAndCopy( char* source, int sourceLength )
-        {
-            //alloc with include zero-'\0' end-of-string
-            var destPtr = Marshal.AllocHGlobal( (sourceLength + 1) * sizeof(char) );
-            var destination = (char*) destPtr;
-            for ( ; 0 < sourceLength; sourceLength-- )
-            {
-                *(destination++) = *(source++);
-            }
-            *destination = '\0';
-            return (destPtr);
-        }
-        [M(O.AggressiveInlining)] public static IntPtr AllocHGlobalAndCopy( IntPtr source, int sourceLength ) => AllocHGlobalAndCopy( (char*) source, sourceLength );
-
         [M(O.AggressiveInlining)] public static bool HasLetters( string value )
         {
             fixed ( char* value_ptr = value )

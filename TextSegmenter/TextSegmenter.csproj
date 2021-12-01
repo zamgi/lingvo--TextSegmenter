@@ -10,6 +10,7 @@
     <RootNamespace>lingvo.ts</RootNamespace>
     <AssemblyName>TextSegmenter</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -44,6 +45,7 @@
     <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="TextSegmenter\ITextSegmenter.cs" />
     <Compile Include="TextSegmenter\Models\IModel.cs" />
+    <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\NativeMemAllocationMediator.cs" />
     <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\NativeTextMMFModelBinary.cs" />
     <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\BinaryModelConfig.cs" />
     <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\Txt2BinModelConverter\Txt2BinModelConverter.cs" />

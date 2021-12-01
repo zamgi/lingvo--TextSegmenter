@@ -15,7 +15,7 @@ namespace lingvo.ts
     /// <summary>
     /// 
     /// </summary>
-    public sealed class RESTProcessHandler : IHttpHandler
+    public sealed class ProcessHandler : IHttpHandler
     {
         /// <summary>
         /// 
@@ -138,7 +138,7 @@ namespace lingvo.ts
         }
 
 
-        static RESTProcessHandler() => Environment.CurrentDirectory = HttpContext.Current.Server.MapPath( "~/" );
+        static ProcessHandler() => Environment.CurrentDirectory = HttpContext.Current.Server.MapPath( "~/" );
 
         public bool IsReusable => true;
         public void ProcessRequest( HttpContext context )
@@ -207,10 +207,10 @@ namespace lingvo.ts
         public static T GetRequestEnumParam< T >( this HttpContext context, string paramName ) where T : struct => ((T) Enum.Parse( typeof(T), context.Request[ paramName ], true ));
         public static T? TryGetRequestEnumParam< T >( this HttpContext context, string paramName ) where T : struct => (Enum.TryParse< T >( context.Request[ paramName ], true, out var t ) ? t : ((T?) null));
 
-        public static void ToJson( this HttpResponse response, ICollection< RESTProcessHandler.result.tuple_TermProbability_Offset > termProbsByRows ) => 
-            response.ToJson( new RESTProcessHandler.result( termProbsByRows ) );
-        public static void ToJson( this HttpResponse response, Exception ex ) => response.ToJson( new RESTProcessHandler.result( ex ) );
-        public static void ToJson( this HttpResponse response, RESTProcessHandler.result result )
+        public static void ToJson( this HttpResponse response, ICollection< ProcessHandler.result.tuple_TermProbability_Offset > termProbsByRows ) => 
+            response.ToJson( new ProcessHandler.result( termProbsByRows ) );
+        public static void ToJson( this HttpResponse response, Exception ex ) => response.ToJson( new ProcessHandler.result( ex ) );
+        public static void ToJson( this HttpResponse response, ProcessHandler.result result )
         {
             response.ContentType = "application/json";
             //---response.Headers.Add( "Access-Control-Allow-Origin", "*" );

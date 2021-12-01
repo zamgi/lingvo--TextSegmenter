@@ -144,10 +144,9 @@ namespace lingvo.ts.TestApp
             Console.Write( "load \"-binary-\" language model's..." );
 
             var sw = Stopwatch.StartNew();
-            using ( var uts = new UnionTextSegmenter( _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_RU(), _ULanguage_.RU ),
-                                                      _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_EN(), _ULanguage_.EN ),
-                                                      _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_DE(), _ULanguage_.DE ) )
-                  )
+            using var uts = new UnionTextSegmenter( _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_RU(), _ULanguage_.RU ),
+                                                    _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_EN(), _ULanguage_.EN ),
+                                                    _UInitParam_.Create( Config.Inst.GetBinaryModelConfig_DE(), _ULanguage_.DE ) );
             {
                 Console.WriteLine( $"=> elapsed: {sw.StopAndElapsed()}\r\n" );
 

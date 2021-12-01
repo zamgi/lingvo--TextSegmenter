@@ -27,44 +27,37 @@ namespace lingvo.ts
 #endif
         #region [.private field's.]
         private SetNative _Set;
-        #endregion        
+        private NativeMemAllocationMediator _NativeMemAllocator;
+        #endregion
 
         #region [.ctor().]
-        public NativeTextMMFModelBinary( BinaryModelConfig config ) => _Set = LoadBinaryModel( config );
+        public NativeTextMMFModelBinary( BinaryModelConfig config )
+        {
+            _NativeMemAllocator = new NativeMemAllocationMediator( nativeBlockAllocSize: 1024 * 1024 );
+            _Set = LoadBinaryModel( config, _NativeMemAllocator );
+        }
         ~NativeTextMMFModelBinary() => DisposeNativeResources();
-
         public void Dispose()
         {
             DisposeNativeResources();
-
             GC.SuppressFinalize( this );
         }
-        private void DisposeNativeResources()
-        {
-            if ( _Set != null )
-            {
-                foreach ( var ptr in _Set )
-                {
-                    Marshal.FreeHGlobal( ptr );
-                }
-                _Set = null;
-            }
-        } 
+        private void DisposeNativeResources() => _NativeMemAllocator.Dispose();
         #endregion
 
         #region [.model-dictionary loading.]
-        private static SetNative LoadBinaryModel( BinaryModelConfig config )
+        private static SetNative LoadBinaryModel( BinaryModelConfig config, NativeMemAllocationMediator nativeMemAllocator )
         {
             var set = new SetNative( config.ModelDictionaryCapacity );
 
             foreach ( var modelFilename in config.ModelFilenames )
             {
-                LoadFromBinFile( modelFilename, set );
+                LoadFromBinFile( modelFilename, set, nativeMemAllocator );
             }
 
             return (set);
         }
-        unsafe private static void LoadFromBinFile( string modelFilename, SetNative set )
+        unsafe private static void LoadFromBinFile( string modelFilename, SetNative set, NativeMemAllocationMediator nativeMemAllocator )
         {
             const int BUFFER_SIZE = 0x2000;
 
@@ -91,14 +84,29 @@ namespace lingvo.ts
                             //alloc with include zero-'\0' end-of-string
                             var source       = bufferCharPtr;
                             var sourceLength = idx;
-                            var recordSize   = ((sourceLength + 1) * sizeof(char)) + sizeof(double);
-                            var destPtr = Marshal.AllocHGlobal( recordSize );
-                            var destination = (char*) destPtr;
-                            for ( ; 0 < sourceLength; sourceLength-- )
-                            {
-                                *(destination++) = *(source++);
-                            }
+
+                            var sourceLenInBytes = sourceLength * sizeof(char);
+                            var recordSize   = (sourceLenInBytes + sizeof(char)) + sizeof(double);
+                            var destPtr      = nativeMemAllocator.Alloc( recordSize );
+                            Buffer.MemoryCopy( source, (void*) destPtr, sourceLenInBytes, sourceLenInBytes );
+                            source += sourceLength;
+                            var destination = ((char*) destPtr) + sourceLength;
                             *destination = '\0';
+
+                            #region comm. prev.
+                            //*
+                            //var recordSize  = ((sourceLength + 1) * sizeof(char)) + sizeof(double);
+                            //var destPtr     = Marshal.AllocHGlobal( recordSize );
+
+                            //var destination = (char*) destPtr;
+                            //for ( ; 0 < sourceLength; sourceLength-- )
+                            //{
+                            //    *(destination++) = *(source++);
+                            //}
+                            //*destination = '\0';
+                            //*/
+                            #endregion
+
                             #endregion
 
                             #region [.read probability.]

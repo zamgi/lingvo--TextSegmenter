@@ -91,7 +91,7 @@
 
         $.ajax({
             type: "POST",
-            url:  "RESTProcessHandler.ashx",
+            url:  "ProcessHandler.ashx",
             data: {
                 text: text,
                 lang: lang
@@ -159,7 +159,7 @@
     (function() {
         $.ajax({
             type: "POST",
-            url: "RESTProcessHandler.ashx",
+            url: "ProcessHandler.ashx",
             data: { text: "_dummy_\r\n_думмиблять_" }
         });
     })();
