@@ -62,7 +62,11 @@ namespace lingvo.ts
                 _NativeString       = NativeString.EMPTY;
                 
                 _FS  = new FileStream( fileName, FileMode.Open, FileAccess.Read, FileShare.Read, BUFFER_SIZE, FileOptions.SequentialScan );
+#if NETSTANDARD || NETCOREAPP
+                _MMF = MemoryMappedFile.CreateFromFile( _FS, null, 0L, MemoryMappedFileAccess.Read, HandleInheritability.None, true );
+#else
                 _MMF = MemoryMappedFile.CreateFromFile( _FS, null, 0L, MemoryMappedFileAccess.Read, new MemoryMappedFileSecurity(), HandleInheritability.None, true );
+#endif
                 _Accessor = _MMF.CreateViewAccessor( 0L, 0L, MemoryMappedFileAccess.Read );
 
                 _Accessor.SafeMemoryMappedViewHandle.AcquirePointer( ref _Buffer );
@@ -225,75 +229,5 @@ namespace lingvo.ts
 
         protected static CharType* _CTM;
         static MMFModelBase() => _CTM = xlat_Unsafe.Inst._CHARTYPE_MAP;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    unsafe internal struct IntPtrEqualityComparer : IEqualityComparer< IntPtr >
-    {
-        [M(O.AggressiveInlining)] public bool Equals( IntPtr x, IntPtr y )
-        {
-            //--practically does not happen--// if ( x == y ) return (true);
-
-            for ( char* x_ptr = (char*) x,
-                        y_ptr = (char*) y; ; x_ptr++, y_ptr++ )
-            {
-                var x_ch = *x_ptr;
-                if ( x_ch != *y_ptr )
-                    return (false);
-                if ( x_ch == '\0' )
-                    return (true);
-            }
-        }
-        [M(O.AggressiveInlining)] public int GetHashCode( IntPtr obj )
-        {
-            char* ptr = (char*) obj;
-            int n1 = 5381;
-            int n2 = 5381;
-            int n3;
-            while ( (n3 = (int) (*(ushort*) ptr)) != 0 )
-            {
-                n1 = ((n1 << 5) + n1 ^ n3);
-                n2 = ((n2 << 5) + n2 ^ n3);
-                ptr++;
-            }
-            return (n1 + n2 * 1566083941);
-        }            
-
-        [M(O.AggressiveInlining)] public bool Equals( char* x, char* y, char* y_end )
-        {
-            //--practically does not happen--// if ( x == y ) return (true);
-
-            for ( ; ; x++ )
-            {
-                var x_ch = *x;
-                if ( x_ch != *y )
-                    return (false);
-                if ( (x_ch == '\0') || (++y == y_end) )
-                    return (true);
-            }
-        }
-
-        [M(O.AggressiveInlining)] public int GetHashCode( in NativeOffset no )
-        {
-            char* ptr    = no.BasePtr + no.StartIndex;
-            char* endPtr = ptr + no.Length;
-            int n1 = 5381;
-            int n2 = 5381;
-            for( ; ; )
-            {
-                var n3 = (int) (*(ushort*) ptr);
-                n1 = ((n1 << 5) + n1 ^ n3);
-                n2 = ((n2 << 5) + n2 ^ n3);
-                ptr++;
-
-                if ( ptr == endPtr )
-                {
-                    break;
-                }
-            }
-            return (n1 + n2 * 1566083941);
-        }            
     }
 }

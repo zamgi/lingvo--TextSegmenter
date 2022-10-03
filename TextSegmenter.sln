@@ -1,25 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30517.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "[lib]", "[lib]", "{8A360507-2F7E-4AB2-920B-4EB2D081DD50}"
-	ProjectSection(SolutionItems) = preProject
-		[lib]\log4net.dll = [lib]\log4net.dll
-		[lib]\Newtonsoft.Json.dll = [lib]\Newtonsoft.Json.dll
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "model-builder", "model-builder", "{693598A1-042F-4AA0-846D-FEDD6D84C41B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ts.model-builder.console", "model-builder\ts.model-builder.console\ts.model-builder.console.csproj", "{AAA90FE0-69A2-49F3-AD48-612B7542C167}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextSegmenter.Model-Builder.Console", "model-builder\TextSegmenter.model-builder.console\TextSegmenter.Model-Builder.Console.csproj", "{AAA90FE0-69A2-49F3-AD48-612B7542C167}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ts.model-converter-txt-2-bin.console", "model-builder\ts.model-converter-txt-2-bin.console\ts.model-converter-txt-2-bin.console.csproj", "{EF01DB2C-1FE7-4C16-9E24-C24991F5FE3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextSegmenter.Model-Converter-Txt-2-Bin.Console", "model-builder\TextSegmenter.model-converter-txt-2-bin.console\TextSegmenter.Model-Converter-Txt-2-Bin.Console.csproj", "{EF01DB2C-1FE7-4C16-9E24-C24991F5FE3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextSegmenter", "TextSegmenter\TextSegmenter.csproj", "{ECCF795C-AC42-48BF-B78E-EBAC863E2D6A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextSegmenter", "TextSegmenter\TextSegmenter.csproj", "{ECCF795C-AC42-48BF-B78E-EBAC863E2D6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ts.TestApp", "ts.TestApp\ts.TestApp.csproj", "{AA0EF758-AF25-43A3-8FA9-6594456F6F59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextSegmenter.Console", "TextSegmenter.Console\TextSegmenter.Console.csproj", "{AA0EF758-AF25-43A3-8FA9-6594456F6F59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ts.web.demo", "ts.web.demo\ts.web.demo.csproj", "{F03EF4AC-CFF4-4374-8C99-31FEE879E7E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextSegmenter.WebService", "TextSegmenter.WebService\TextSegmenter.WebService.csproj", "{5CCC567B-8800-4D31-9B05-C7EEB1D778B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,10 +37,10 @@ Global
 		{AA0EF758-AF25-43A3-8FA9-6594456F6F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA0EF758-AF25-43A3-8FA9-6594456F6F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA0EF758-AF25-43A3-8FA9-6594456F6F59}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F03EF4AC-CFF4-4374-8C99-31FEE879E7E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F03EF4AC-CFF4-4374-8C99-31FEE879E7E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F03EF4AC-CFF4-4374-8C99-31FEE879E7E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F03EF4AC-CFF4-4374-8C99-31FEE879E7E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CCC567B-8800-4D31-9B05-C7EEB1D778B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CCC567B-8800-4D31-9B05-C7EEB1D778B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CCC567B-8800-4D31-9B05-C7EEB1D778B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CCC567B-8800-4D31-9B05-C7EEB1D778B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

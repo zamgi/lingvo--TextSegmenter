@@ -1,8 +1,4 @@
-﻿//#define XLAT_CHARTYPE_MAP
-//#define XLAT_UPPER_INVARIANT_MAP
-//#define XLAT_WHITESPACE_CHARS
-
-using System;
+﻿using System;
 
 using lingvo.core;
 
@@ -100,7 +96,7 @@ namespace lingvo.tokenizing
                 return (text);
             }
 
-            #region
+            #region comm.
             /*
             fixed ( char* _base = text )
             {

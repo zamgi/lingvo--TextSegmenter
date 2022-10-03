@@ -31,10 +31,10 @@ namespace lingvo.ts.modelconverter
         private int    _OutputFileSizeInBytes;
         private int    _OutputFileNumber;
 
-        private Txt2BinModelConverter( ref Txt2BinModelConverterConfig config )
+        private Txt2BinModelConverter( in Txt2BinModelConverterConfig config )
         {
             if ( config.Model == null ) throw (new ArgumentNullException( nameof(config.Model) ));
-            if ( string.IsNullOrWhiteSpace( config.OutputFileName ) ) throw (new ArgumentNullException( nameof(config.OutputFileName) ));
+            if ( config.OutputFileName.IsNullOrWhiteSpace() ) throw (new ArgumentNullException( nameof(config.OutputFileName) ));
             //------------------------------------------------------------------//
 
             _Model                 = config.Model;
@@ -42,7 +42,7 @@ namespace lingvo.ts.modelconverter
             _OutputDirectoryName   = Path.GetDirectoryName( config.OutputFileName );
             _OutputFileNamePattern = Path.GetFileNameWithoutExtension( config.OutputFileName );
             _OutputFileExtension   = Path.GetExtension( config.OutputFileName );
-            if ( string.IsNullOrWhiteSpace( _OutputFileExtension ) )
+            if ( _OutputFileExtension.IsNullOrWhiteSpace() )
             {
                 _OutputFileExtension = DEFAULT_FILE_EXTENSION;
             }
@@ -166,9 +166,9 @@ namespace lingvo.ts.modelconverter
             return (outputFileNames);
         }
 
-        public static IList< string > Run( Txt2BinModelConverterConfig config )
+        public static IList< string > Run( in Txt2BinModelConverterConfig config )
         {
-            var converter = new Txt2BinModelConverter( ref config );
+            var converter = new Txt2BinModelConverter( config );
             var outputFileNames = converter.Save();
             return (outputFileNames);
         }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
-using lingvo.core;
-
 namespace lingvo.ts
 {
     /// <summary>
@@ -13,9 +11,9 @@ namespace lingvo.ts
     public class TextModelConfig
     {
         protected const string INVALIDDATAEXCEPTION_FORMAT_MESSAGE = "Wrong format of model-filename (file-name: '{0}', line# {1}, line-value: '{2}')";
-        protected const           NumberStyles     NS  = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent;
-        protected static readonly NumberFormatInfo NFI = new NumberFormatInfo() { NumberDecimalSeparator = "." };
+        protected const NumberStyles NS = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent;
 
+        protected readonly NumberFormatInfo NFI = new NumberFormatInfo() { NumberDecimalSeparator = "." };
         public TextModelConfig( string modelFilename, int modelDictionaryCapacity = 0 )
         {
             modelFilename.ThrowIfNullOrWhiteSpace( nameof(modelFilename) );

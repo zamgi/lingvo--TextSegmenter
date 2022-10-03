@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+
 using lingvo.core;
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.ts
 {
@@ -18,42 +20,31 @@ namespace lingvo.ts
         {
             if ( string.IsNullOrWhiteSpace( text ) ) throw (new ArgumentNullException( paramName ));
         }     
-        public static void ThrowIfNullOrWhiteSpaceAnyElement( this IEnumerable< string > sequence, string paramName )
+        public static void ThrowIfNullOrWhiteSpaceAnyElement( this IEnumerable< string > seq, string paramName )
         {
-            if ( sequence == null ) throw (new ArgumentNullException( paramName ));
+            if ( seq == null ) throw (new ArgumentNullException( paramName ));
 
-            foreach ( var c in sequence )
+            foreach ( var c in seq )
             {
                 if ( string.IsNullOrWhiteSpace( c ) )
                 {
-                    throw (new ArgumentNullException( paramName + " => some collection element is Null-or-WhiteSpace" ));
+                    throw (new ArgumentNullException( $"'{paramName}' => some collection element is Null-or-WhiteSpace." ));
                 }
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNullOrWhiteSpace( this string text ) => string.IsNullOrWhiteSpace( text );
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNullOrEmpty( this string text ) => string.IsNullOrEmpty( text );
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ModelRecord ToModelRecord( this KeyValuePair< string, double > p ) => new ModelRecord() { Ngram = p.Key, Probability = p.Value };
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ModelRecord ToModelRecord( this KeyValuePair< IntPtr, double > p ) => new ModelRecord() { Ngram = StringsHelper.ToString( p.Key ), Probability = p.Value };
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable< ModelRecord > GetAllModelRecords( this Dictionary< string, double > dict )
+        [M(O.AggressiveInlining)] public static bool IsNullOrWhiteSpace( this string text ) => string.IsNullOrWhiteSpace( text );
+        [M(O.AggressiveInlining)] public static bool IsNullOrEmpty( this string text ) => string.IsNullOrEmpty( text );
+        [M(O.AggressiveInlining)] private static ModelRecord ToModelRecord( this KeyValuePair< string, double > p ) => new ModelRecord() { Ngram = p.Key, Probability = p.Value };
+        [M(O.AggressiveInlining)] private static ModelRecord ToModelRecord( this KeyValuePair< IntPtr, double > p ) => new ModelRecord() { Ngram = StringsHelper.ToString( p.Key ), Probability = p.Value };
+        [M(O.AggressiveInlining)] public static IEnumerable< ModelRecord > GetAllModelRecords( this Dictionary< string, double > dict )
         {
             foreach ( var p in dict )
             {
                 yield return (p.ToModelRecord());
             }            
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable< ModelRecord > GetAllModelRecords( this Dictionary< IntPtr, double > dict )
+        [M(O.AggressiveInlining)] public static IEnumerable< ModelRecord > GetAllModelRecords( this Dictionary< IntPtr, double > dict )
         {
             foreach ( var p in dict )
             {

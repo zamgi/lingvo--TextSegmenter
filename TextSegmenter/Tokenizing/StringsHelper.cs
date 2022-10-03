@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
 using M = System.Runtime.CompilerServices.MethodImplAttribute;
 using O = System.Runtime.CompilerServices.MethodImplOptions;
@@ -25,42 +24,125 @@ namespace lingvo.core
             var len = value.Length;
             if ( 0 < len )
             {
-                var valueUpper = string.Copy( value );
-                fixed ( char* valueUpper_ptr = valueUpper )
+                string valueUpper;
+
+                const int THRESHOLD = 1024;
+                if ( len <= THRESHOLD )
                 {
-                    for ( int i = 0; i < len; i++ )
+                    var chars = stackalloc char[ len ];
+                    fixed ( char* value_ptr = value )
                     {
-                        var ptr = valueUpper_ptr + i;
-                        *ptr = *(_UPPER_INVARIANT_MAP + *ptr);
+                        for ( var i = 0; i < len; i++ )
+                        {
+                            chars[ i ] = _UPPER_INVARIANT_MAP[ value_ptr[ i ] ];
+                        }
                     }
+                    valueUpper = new string( chars, 0, len );
                 }
+                else
+                {
+                    valueUpper = new string( '\0', len ); // string.Copy( value ); // => [Obsolete( "This API should not be used to create mutable strings. See https://go.microsoft.com/fwlink/?linkid=2084035 for alternatives." )]
+                    fixed ( char* value_ptr = value )
+                    fixed ( char* valueUpper_ptr = valueUpper )
+                    {
+                        for ( var i = 0; i < len; i++ )
+                        {
+                            valueUpper_ptr[ i ] = _UPPER_INVARIANT_MAP[ value_ptr[ i ] ];
+                        }
+                    }                    
+                }
+
                 return (valueUpper);
             }
             return (string.Empty);
         }
+        //[M(O.AggressiveInlining)] public static string ToUpperInvariant( string value )
+        //{
+        //    var len = value.Length;
+        //    if ( 0 < len )
+        //    {
+        //        var valueUpper = string.Copy( value );
+        //        fixed ( char* valueUpper_ptr = valueUpper )
+        //        {
+        //            for ( int i = 0; i < len; i++ )
+        //            {
+        //                var ptr = valueUpper_ptr + i;
+        //                *ptr = *(_UPPER_INVARIANT_MAP + *ptr);
+        //            }
+        //        }
+        //        return (valueUpper);
+        //    }
+        //    return (string.Empty);
+        //}
         [M(O.AggressiveInlining)] public static string ToUpperInvariant( string value, out bool isNullOrWhiteSpace )
         {
             isNullOrWhiteSpace = true;
             var len = value.Length;
             if ( 0 < len )
             {
-                var valueUpper = string.Copy( value );
-                fixed ( char* valueUpper_ptr = valueUpper )
+                string valueUpper;
+
+                const int THRESHOLD = 1024;
+                if ( len <= THRESHOLD )
                 {
-                    for ( int i = 0; i < len; i++ )
+                    var chars = stackalloc char[ len ];
+                    fixed ( char* value_ptr = value )
                     {
-                        var ptr = valueUpper_ptr + i;
-                        *ptr = *(_UPPER_INVARIANT_MAP + *ptr);
-                        if ( (_CHARTYPE_MAP[ *ptr ] & CharType.IsWhiteSpace) != CharType.IsWhiteSpace )
+                        for ( var i = 0; i < len; i++ )
                         {
-                            isNullOrWhiteSpace = false;
+                            chars[ i ] = _UPPER_INVARIANT_MAP[ value_ptr[ i ] ];
+                            if ( (_CHARTYPE_MAP[ chars[ i ] ] & CharType.IsWhiteSpace) != CharType.IsWhiteSpace )
+                            {
+                                isNullOrWhiteSpace = false;
+                            }
                         }
                     }
+                    valueUpper = new string( chars, 0, len );
                 }
+                else
+                {
+                    valueUpper = new string( '\0', len ); // string.Copy( value ); // => [Obsolete( "This API should not be used to create mutable strings. See https://go.microsoft.com/fwlink/?linkid=2084035 for alternatives." )]
+                    fixed ( char* value_ptr = value )
+                    fixed ( char* valueUpper_ptr = valueUpper )
+                    {
+                        for ( var i = 0; i < len; i++ )
+                        {
+                            valueUpper_ptr[ i ] = _UPPER_INVARIANT_MAP[ value_ptr[ i ] ];
+                            if ( (_CHARTYPE_MAP[ valueUpper_ptr[ i ] ] & CharType.IsWhiteSpace) != CharType.IsWhiteSpace )
+                            {
+                                isNullOrWhiteSpace = false;
+                            }
+                        }
+                    }                    
+                }
+
                 return (valueUpper);
             }
             return (string.Empty);
         }
+        //[M(O.AggressiveInlining)] public static string ToUpperInvariant( string value, out bool isNullOrWhiteSpace )
+        //{
+        //    isNullOrWhiteSpace = true;
+        //    var len = value.Length;
+        //    if ( 0 < len )
+        //    {
+        //        var valueUpper = string.Copy( value );
+        //        fixed ( char* valueUpper_ptr = valueUpper )
+        //        {
+        //            for ( int i = 0; i < len; i++ )
+        //            {
+        //                var ptr = valueUpper_ptr + i;
+        //                *ptr = *(_UPPER_INVARIANT_MAP + *ptr);
+        //                if ( (_CHARTYPE_MAP[ *ptr ] & CharType.IsWhiteSpace) != CharType.IsWhiteSpace )
+        //                {
+        //                    isNullOrWhiteSpace = false;
+        //                }
+        //            }
+        //        }
+        //        return (valueUpper);
+        //    }
+        //    return (string.Empty);
+        //}
         [M(O.AggressiveInlining)] public static void   ToUpperInvariant( char* wordFrom, char* bufferTo )
         {
             for ( ; ; wordFrom++, bufferTo++ )
@@ -119,7 +201,6 @@ namespace lingvo.core
 
         [M(O.AggressiveInlining)] public static string ToLowerInvariant( string value ) => value.ToLowerInvariant();
 
-        /// проверка эквивалентности строк
         [M(O.AggressiveInlining)] public static bool IsEqual( string first, string second )
         {
             int length = first.Length;

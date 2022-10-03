@@ -33,9 +33,7 @@ namespace lingvo.ts
         /// </summary>
         unsafe protected sealed class TextModelFileReaderMMF : TextModelConfig
         {
-            private TextModelFileReaderMMF( TextModelConfig config ) : base( config.ModelFilename, config.ModelDictionaryCapacity )
-            {
-            }
+            private TextModelFileReaderMMF( TextModelConfig config ) : base( config.ModelFilename, config.ModelDictionaryCapacity ) { }
 
             private void LoadModelFilenameContent( LoadModelFileContentCallback callbackAction )
             {

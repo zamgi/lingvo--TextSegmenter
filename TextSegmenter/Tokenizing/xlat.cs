@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Runtime.InteropServices;
+
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.core
 {
@@ -49,27 +51,6 @@ namespace lingvo.core
     {
 #if XLAT_CHARTYPE_MAP
         public static readonly CharType[] CHARTYPE_MAP = new CharType[ char.MaxValue + 1 ];
-        private static readonly char[] QUOTES_LEFT  = new[] { '«', //0x00AB, 0171
-                                                              '‹', //0x2039, 8249
-                                                              '„', //0x201E, 8222
-                                                              '“', //0x201C, 8220                                                              
-                                                            };
-        private static readonly char[] QUOTES_RIGHT = new[] { '»', //0x00BB, 0187
-                                                              '›', //0x203A, 8250
-                                                              '”', //0x201D, 8221
-                                                              '‟', //0x201F, 8223
-                                                            };
-        private static readonly char   QUOTE_LEFT_RIGHT    = '"'; //0x0022, 0034
-        private static readonly char[] QUOTES_DOUBLE_SIDED = new[] { '‛', //0x201B, 8219 - не встречается
-                                                                     '‚', //0x201A, 8218 - не встречается
-                                                                     '‘', //0x2018, 8216  - не встречается
-                                                                     '’', //0x2019, 8217 - не встречается в качестве кавычки                                                                      
-                                                                     '\'',//
-                                                                     QUOTE_LEFT_RIGHT,
-                                                                   };
-        private static readonly char[] BRACKETS_LEFT  = new[] { '(', '‹', '{', '[', };
-        private static readonly char[] BRACKETS_RIGHT = new[] { ')', '›', '}', ']', };
-        private static readonly char[] HYPHENS        = new[] { '-', '—', '–', };
 #endif
 #if XLAT_UPPER_INVARIANT_MAP
         public static readonly char[] UPPER_INVARIANT_MAP = new char[ char.MaxValue + 1 ];
@@ -77,7 +58,6 @@ namespace lingvo.core
 #if XLAT_WHITESPACE_CHARS
         public static readonly char[] WHITESPACE_CHARS;
 #endif
-
         static xlat()
         {            
 #if XLAT_CHARTYPE_MAP
@@ -121,6 +101,30 @@ namespace lingvo.core
                     break;
                 }
             }
+
+            #region [.defines.]
+            var QUOTES_LEFT  = new[] { '«', //0x00AB, 0171
+                                       '‹', //0x2039, 8249
+                                       '„', //0x201E, 8222
+                                       '“', //0x201C, 8220
+                                     };
+            var QUOTES_RIGHT = new[] { '»', //0x00BB, 0187
+                                       '›', //0x203A, 8250
+                                       '”', //0x201D, 8221
+                                       '‟', //0x201F, 8223
+                                     };
+            var QUOTE_LEFT_RIGHT    = '"'; //0x0022, 0034
+            var QUOTES_DOUBLE_SIDED = new[] { '‛', //0x201B, 8219 - не встречается
+                                              '‚', //0x201A, 8218 - не встречается
+                                              '‘', //0x2018, 8216  - не встречается
+                                              '’', //0x2019, 8217 - не встречается в качестве кавычки
+                                              '\'',//
+                                              QUOTE_LEFT_RIGHT,
+                                            };
+            var BRACKETS_LEFT  = new[] { '(', '‹', '{', '[', };
+            var BRACKETS_RIGHT = new[] { ')', '›', '}', ']', };
+            var HYPHENS        = new[] { '-', '—', '–', };
+            #endregion
 
             foreach ( var c in HYPHENS )
             {
@@ -195,10 +199,8 @@ namespace lingvo.core
 #endif
         }
 		
-        public static bool IsDot( char ch )
+        [M(O.AggressiveInlining)] public static bool IsDot( char ch )
         {
-            //return (ch == '.');
-            //*
             switch ( ch )
             {
                 case '.':
@@ -208,10 +210,9 @@ namespace lingvo.core
                 default:
                     return (false);
             }
-            //*/
         }
-        public static bool IsAscii( char ch ) => (0 <= ch && ch <= 127);
-        public static bool IsURIschemes( char ch )
+        [M(O.AggressiveInlining)] public static bool IsAscii( char ch ) => (0 <= ch && ch <= 127);
+        [M(O.AggressiveInlining)] public static bool IsURIschemes( char ch )
         {
             if ( ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') )
             {
@@ -225,7 +226,7 @@ namespace lingvo.core
                     return (false);
             }
         }
-        public static bool IsURIschemesPathSeparator( char ch )
+        [M(O.AggressiveInlining)] public static bool IsURIschemesPathSeparator( char ch )
         {
             switch ( ch )    
             {
@@ -236,7 +237,7 @@ namespace lingvo.core
                     return (false);
             }
         }
-        public static bool IsDegree( char ch )
+        [M(O.AggressiveInlining)] public static bool IsDegree( char ch )
         {
             switch ( ch )
             {
@@ -247,7 +248,7 @@ namespace lingvo.core
                     return (false);
             }
         }
-        public static bool IsSlash( char ch )
+        [M(O.AggressiveInlining)] public static bool IsSlash( char ch )
         {
             switch ( ch )
             {
@@ -261,7 +262,6 @@ namespace lingvo.core
         }	
     }
 
-
     /// <summary>
     /// 
     /// </summary>
@@ -272,59 +272,14 @@ namespace lingvo.core
 #endif
     sealed class xlat_Unsafe
     {
-        /// <summary>
-        /// Обозначение начала предложения (в формате CRFSuit)
-        /// </summary> 
-        public const string BEGIN_OF_SENTENCE = "__BOS__";
-        /// <summary>
-        /// Обозначение конца предложения (в формате CRFSuit)
-        /// </summary> 
-        public const string END_OF_SENTENCE = "__EOS__";
-        public const string INPUTTYPE_OTHER = "O";
-
-        public readonly byte* _InputtypeOtherPtrBase;
-        public readonly byte* _PosInputtypeOtherPtrBase;
-        public readonly byte* _NerInputtypeOtherPtrBase;
-        public readonly byte* _BeginOfSentencePtrBase;
-        public readonly byte* _EndOfSentencePtrBase;
-
 #if XLAT_CHARTYPE_MAP
         public readonly CharType* _CHARTYPE_MAP;
 #endif			
 #if XLAT_UPPER_INVARIANT_MAP			
         public readonly char*     _UPPER_INVARIANT_MAP;
 #endif	
-		
         private xlat_Unsafe()
         {
-            //string POSINPUTTYPE_OTHER = PosTaggerInputType.O.ToText();
-            //string NERINPUTTYPE_OTHER = NerInputType.O.ToText();
-            
-            //-1-            
-            var inputtypeOtherBytes         = Encoding.UTF8.GetBytes( INPUTTYPE_OTHER );
-            var inputtypeOtherBytesGCHandle = GCHandle.Alloc( inputtypeOtherBytes, GCHandleType.Pinned );
-            _InputtypeOtherPtrBase          = (byte*) inputtypeOtherBytesGCHandle.AddrOfPinnedObject().ToPointer();
-
-            //-1-            
-            var posInputtypeOtherBytes         = Encoding.UTF8.GetBytes( INPUTTYPE_OTHER /*POSINPUTTYPE_OTHER*/ );
-            var posInputtypeOtherBytesGCHandle = GCHandle.Alloc( posInputtypeOtherBytes, GCHandleType.Pinned );
-            _PosInputtypeOtherPtrBase          = (byte*) posInputtypeOtherBytesGCHandle.AddrOfPinnedObject().ToPointer();
-
-            //-1-            
-            var nerInputtypeOtherBytes         = Encoding.UTF8.GetBytes( INPUTTYPE_OTHER /*NERINPUTTYPE_OTHER*/ );
-            var nerInputtypeOtherBytesGCHandle = GCHandle.Alloc( nerInputtypeOtherBytes, GCHandleType.Pinned );
-            _NerInputtypeOtherPtrBase          = (byte*) nerInputtypeOtherBytesGCHandle.AddrOfPinnedObject().ToPointer();
-
-            //-2-
-            var beginOfSentenceBytes         = Encoding.UTF8.GetBytes( BEGIN_OF_SENTENCE );
-            var beginOfSentenceBytesGCHandle = GCHandle.Alloc( beginOfSentenceBytes, GCHandleType.Pinned );
-            _BeginOfSentencePtrBase          = (byte*) beginOfSentenceBytesGCHandle.AddrOfPinnedObject().ToPointer();
-
-            //-3-
-            var endOfSentenceBytes         = Encoding.UTF8.GetBytes( END_OF_SENTENCE );
-            var endOfSentenceBytesGCHandle = GCHandle.Alloc( endOfSentenceBytes, GCHandleType.Pinned );
-            _EndOfSentencePtrBase          = (byte*) endOfSentenceBytesGCHandle.AddrOfPinnedObject().ToPointer();
-
 #if XLAT_CHARTYPE_MAP
             //-4-
             var x = new ushort[ xlat.CHARTYPE_MAP.Length ];
@@ -344,16 +299,6 @@ namespace lingvo.core
 #endif	
         }
 
-        public static readonly xlat_Unsafe Inst = new xlat_Unsafe();
-
-#if XLAT_CHARTYPE_MAP
-        public bool IsUpper( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsUpper) == CharType.IsUpper);
-        public bool IsLower( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsLower) == CharType.IsLower);
-        public bool IsLetter( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsLetter) == CharType.IsLetter);
-        public bool IsDigit( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsDigit) == CharType.IsDigit);
-        public bool IsWhiteSpace( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsWhiteSpace) == CharType.IsWhiteSpace);
-        public bool IsPunctuation( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsPunctuation) == CharType.IsPunctuation);
-        public bool IsHyphen( char ch ) => ((_CHARTYPE_MAP[ ch ] & CharType.IsHyphen) == CharType.IsHyphen);
-#endif		
+        public static xlat_Unsafe Inst { [M(O.AggressiveInlining)] get; } = new xlat_Unsafe();
     }
 }

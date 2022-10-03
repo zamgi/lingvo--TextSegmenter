@@ -1,29 +1,15 @@
-﻿//#define XLAT_CHARTYPE_MAP
-//#define XLAT_UPPER_INVARIANT_MAP
-//#define XLAT_WHITESPACE_CHARS
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
 using lingvo.core;
 using lingvo.urls;
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace lingvo.tokenizing
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public enum NGramsType
-    {
-        NGram_1,
-        NGram_2,
-        NGram_3,
-        NGram_4,
-    }
-
     /// <summary>
     /// 
     /// </summary>
@@ -36,25 +22,6 @@ namespace lingvo.tokenizing
         {
             #region [.static & xlat table's.]
             public static readonly char*   MAX_PTR = (char*) (0xffffffffFFFFFFFF);
-            private const string           INCLUDE_INTERPRETE_AS_WHITESPACE = "¥©¤¦§®¶€™<>";
-            private static readonly char[] EXCLUDE_INTERPRETE_AS_WHITESPACE = new char[] { '\u0026', /* 0x26   , 38   , '&' */
-                                                                                           '\u0027', /* 0x27   , 39   , ''' */
-                                                                                           '\u002D', /* 0x2D   , 45   , '-' */
-                                                                                           '\u002E', /* 0x2E   , 46   , '.' */
-                                                                                           '\u005F', /* 0x5F   , 95   , '_' */
-                                                                                           '\u00AD', /* 0xAD   , 173  , '­' */
-                                                                                           '\u055A', /* 0x55A  , 1370 , '՚' */
-                                                                                           '\u055B', /* 0x55B  , 1371 , '՛' */
-                                                                                           '\u055D', /* 0x55D  , 1373 , '՝' */
-                                                                                           '\u2012', /* 0x2012 , 8210 , '‒' */
-                                                                                           '\u2013', /* 0x2013 , 8211 , '–' */
-                                                                                           '\u2014', /* 0x2014 , 8212 , '—' */
-                                                                                           '\u2015', /* 0x2015 , 8213 , '―' */
-                                                                                           '\u2018', /* 0x2018 , 8216 , '‘' */
-                                                                                           '\u2019', /* 0x2019 , 8217 , '’' */
-                                                                                           '\u201B', /* 0x201B , 8219 , '‛' */
-                                                                                         };
-            private static readonly string INCLUDE_DIGIT_WORD_CHARS = ";,:./\\- –〃´°";
             #endregion
 
             public readonly bool* _INTERPRETE_AS_WHITESPACE;
@@ -62,6 +29,28 @@ namespace lingvo.tokenizing
 
             private UnsafeConst()
             {
+                #region [.defines.]
+                var INCLUDE_INTERPRETE_AS_WHITESPACE = "¥©¤¦§®¶€™<>";
+                var EXCLUDE_INTERPRETE_AS_WHITESPACE = new char[] { '\u0026', /* 0x26   , 38   , '&' */
+                                                                    '\u0027', /* 0x27   , 39   , ''' */
+                                                                    '\u002D', /* 0x2D   , 45   , '-' */
+                                                                    '\u002E', /* 0x2E   , 46   , '.' */
+                                                                    '\u005F', /* 0x5F   , 95   , '_' */
+                                                                    '\u00AD', /* 0xAD   , 173  , '­' */
+                                                                    '\u055A', /* 0x55A  , 1370 , '՚' */
+                                                                    '\u055B', /* 0x55B  , 1371 , '՛' */
+                                                                    '\u055D', /* 0x55D  , 1373 , '՝' */
+                                                                    '\u2012', /* 0x2012 , 8210 , '‒' */
+                                                                    '\u2013', /* 0x2013 , 8211 , '–' */
+                                                                    '\u2014', /* 0x2014 , 8212 , '—' */
+                                                                    '\u2015', /* 0x2015 , 8213 , '―' */
+                                                                    '\u2018', /* 0x2018 , 8216 , '‘' */
+                                                                    '\u2019', /* 0x2019 , 8217 , '’' */
+                                                                    '\u201B', /* 0x201B , 8219 , '‛' */
+                                                                   };
+                var INCLUDE_DIGIT_WORD_CHARS = ";,:./\\- –〃´°";
+                #endregion
+
                 var INTERPRETE_AS_WHITESPACE = new bool[ char.MaxValue - char.MinValue + 1 ];
                 var DIGIT_WORD_CHARS         = new bool[ char.MaxValue - char.MinValue + 1 ];
 
@@ -101,8 +90,22 @@ namespace lingvo.tokenizing
                 _DIGIT_WORD_CHARS = (bool*) DIGIT_WORD_CHARS_GCHandle.AddrOfPinnedObject().ToPointer();
             }
 
-            public static readonly UnsafeConst Inst = new UnsafeConst();
+            public static UnsafeConst Inst { [M(O.AggressiveInlining)] get; } = new UnsafeConst();
         }
+
+        #region [.cctor().]
+        private static readonly CharType* _CTM;
+        private static readonly char*     _UIM;
+        private static readonly bool*     _DWC;
+        private static readonly bool*     _IAW;
+        static mld_tokenizer()
+        {
+            _UIM = xlat_Unsafe.Inst._UPPER_INVARIANT_MAP;
+            _CTM = xlat_Unsafe.Inst._CHARTYPE_MAP;
+            _IAW = UnsafeConst.Inst._INTERPRETE_AS_WHITESPACE;
+            _DWC = UnsafeConst.Inst._DIGIT_WORD_CHARS;
+        }
+        #endregion
 
         #region [.private field's.]
         private const int DEFAULT_WORDCAPACITY      = 1000;
@@ -111,10 +114,6 @@ namespace lingvo.tokenizing
         private readonly UrlDetector    _UrlDetector;
         private readonly List< string > _Words;
         private readonly StringBuilder  _NgramsSB;
-        private readonly CharType*      _CTM;
-        private readonly char*          _UIM;
-        private readonly bool*          _DWC;
-        private readonly bool*          _IAW;
         private char*                   _BASE;
         private char*                   _Ptr;
         private int                     _StartIndex;
@@ -130,49 +129,42 @@ namespace lingvo.tokenizing
         public mld_tokenizer( UrlDetectorModel urlModel ) : this( urlModel, DEFAULT_WORDCAPACITY ) { }
         public mld_tokenizer( UrlDetectorModel urlModel, int wordCapacity )
         {
-            var urlConfig = new UrlDetectorConfig()
-            {
-                Model          = urlModel,
-                UrlExtractMode = UrlDetector.UrlExtractModeEnum.Position,
-            };
-            _UrlDetector = new UrlDetector( urlConfig );
+            _UrlDetector = new UrlDetector( new UrlDetectorConfig( urlModel, UrlDetector.UrlExtractModeEnum.Position ) );
             _Words       = new List< string >( Math.Max( DEFAULT_WORDCAPACITY, wordCapacity ) );
             _NgramsSB    = new StringBuilder();
             _AddWordToListAction = new Action< string >( AddWordToList );
 
-            _UIM = xlat_Unsafe.Inst._UPPER_INVARIANT_MAP;
-            _CTM = xlat_Unsafe.Inst._CHARTYPE_MAP;
-            _IAW = UnsafeConst.Inst._INTERPRETE_AS_WHITESPACE;
-            _DWC = UnsafeConst.Inst._DIGIT_WORD_CHARS;
-
-            //--//
             ReAllocWordToUpperBuffer( DEFAULT_WORDTOUPPERBUFFER );
         }
 
         private void ReAllocWordToUpperBuffer( int newBufferSize )
         {
-            DisposeNativeResources();
+            FreeWordToUpperBuffer();
 
             _WordToUpperBufferSize = newBufferSize;
             var wordToUpperBuffer  = new char[ _WordToUpperBufferSize ];
             _WordToUpperBufferGCHandle = GCHandle.Alloc( wordToUpperBuffer, GCHandleType.Pinned );
             _WordToUpperBufferPtrBase  = (char*) _WordToUpperBufferGCHandle.AddrOfPinnedObject().ToPointer();
         }
-
-        ~mld_tokenizer() => DisposeNativeResources();
-        public void Dispose()
-        {
-            DisposeNativeResources();
-
-            GC.SuppressFinalize( this );
-        }
-        private void DisposeNativeResources()
+        private void FreeWordToUpperBuffer()
         {
             if ( _WordToUpperBufferPtrBase != null )
             {
                 _WordToUpperBufferGCHandle.Free();
                 _WordToUpperBufferPtrBase = null;
             }
+        }
+
+        ~mld_tokenizer() => DisposeNativeResources();
+        public void Dispose()
+        {
+            DisposeNativeResources();
+            GC.SuppressFinalize( this );
+        }
+        private void DisposeNativeResources()
+        {
+            FreeWordToUpperBuffer();
+            _UrlDetector.Dispose();
         }
         #endregion
 

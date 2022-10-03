@@ -7,19 +7,35 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <!--<RetainVMGarbageCollection>true</RetainVMGarbageCollection>-->
   </PropertyGroup>
 
   <PropertyGroup>
     <OutputPath>bin\</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
+  
   <PropertyGroup>
     <DefineConstants>$(DefineConstants)TRACE; XLAT_WHITESPACE_CHARS; XLAT_UPPER_INVARIANT_MAP; XLAT_CHARTYPE_MAP;</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\TextSegmenter\Tokenizing\xlat.cs" Link="Tokenizing\xlat.cs" />
+    <Compile Include="..\..\TextSegmenter\Tokenizing\[not-builded-but-used]\mld_tokenizer.cs" Link="Tokenizing\mld_tokenizer.cs" />
+    <Compile Include="..\..\TextSegmenter\Tokenizing\[not-builded-but-used]\UrlDetector.cs" Link="Tokenizing\UrlDetector.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove=".gitignore" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml.Linq;
@@ -12,7 +13,7 @@ namespace lingvo.urls
     /// <summary>
     /// 
     /// </summary>
-    public class url_t
+    public sealed class url_t
     {
         public string  value;
         public int     startIndex;
@@ -90,10 +91,15 @@ namespace lingvo.urls
     /// </summary>
     public struct UrlDetectorConfig
     {
-        public UrlDetectorConfig( string urlDetectorResourcesXmlFilename )
+        public UrlDetectorConfig( string urlDetectorResourcesXmlFilename, UrlDetector.UrlExtractModeEnum extractMode = UrlDetector.UrlExtractModeEnum.Position )
         {
-            Model = new UrlDetectorModel( urlDetectorResourcesXmlFilename );
-            UrlExtractMode = UrlDetector.UrlExtractModeEnum.Position;
+            Model          = new UrlDetectorModel( urlDetectorResourcesXmlFilename );
+            UrlExtractMode = extractMode;
+        }
+        public UrlDetectorConfig( UrlDetectorModel model, UrlDetector.UrlExtractModeEnum extractMode = UrlDetector.UrlExtractModeEnum.Position )
+        {
+            Model          = model;
+            UrlExtractMode = extractMode;
         }
         public UrlDetectorModel Model { get; set; }
         public UrlDetector.UrlExtractModeEnum UrlExtractMode { get; set; }
@@ -726,7 +732,7 @@ namespace lingvo.urls
     /// <summary>
     /// 
     /// </summary>
-    internal static class UrlDetectorExt
+    internal static class UrlDetectorExtensions
     {
         public static HashSet< string > ToHashset_4Urls( this IEnumerable< string > seq )
             => new HashSet< string >( seq.Select( d => (d != null) ? d.Trim().ToUpperInvariant() : null ).Where( d => !string.IsNullOrEmpty( d ) ) );

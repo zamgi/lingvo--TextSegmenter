@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using lingvo.core;
 
 namespace lingvo.ts
@@ -38,7 +39,6 @@ namespace lingvo.ts
         bool TryGetProbability( in NativeOffset no, out double probability );
 
         IEnumerable< ModelRecord > GetAllRecords();
-
         int RecordCount { get; }
     }
 }

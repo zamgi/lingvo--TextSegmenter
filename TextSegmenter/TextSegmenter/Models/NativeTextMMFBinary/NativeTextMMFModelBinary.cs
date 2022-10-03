@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Runtime.InteropServices;
 
 using lingvo.core;
 using M = System.Runtime.CompilerServices.MethodImplAttribute;
@@ -22,11 +21,11 @@ namespace lingvo.ts
         /// </summary>
         public static class FuskingTraitor
         {
-            public static SetNative GetSet( NativeTextMMFModelBinary model ) => model._Set;
+            public static SetOfIntPtr GetSet( NativeTextMMFModelBinary model ) => model._Set;
         } 
 #endif
         #region [.private field's.]
-        private SetNative _Set;
+        private SetOfIntPtr _Set;
         private NativeMemAllocationMediator _NativeMemAllocator;
         #endregion
 
@@ -46,9 +45,9 @@ namespace lingvo.ts
         #endregion
 
         #region [.model-dictionary loading.]
-        private static SetNative LoadBinaryModel( BinaryModelConfig config, NativeMemAllocationMediator nativeMemAllocator )
+        private static SetOfIntPtr LoadBinaryModel( BinaryModelConfig config, NativeMemAllocationMediator nativeMemAllocator )
         {
-            var set = new SetNative( config.ModelDictionaryCapacity );
+            var set = new SetOfIntPtr( config.ModelDictionaryCapacity );
 
             foreach ( var modelFilename in config.ModelFilenames )
             {
@@ -57,12 +56,16 @@ namespace lingvo.ts
 
             return (set);
         }
-        unsafe private static void LoadFromBinFile( string modelFilename, SetNative set, NativeMemAllocationMediator nativeMemAllocator )
+        unsafe private static void LoadFromBinFile( string modelFilename, SetOfIntPtr set, NativeMemAllocationMediator nativeMemAllocator )
         {
             const int BUFFER_SIZE = 0x2000;
 
             using ( var fs = new FileStream( modelFilename, FileMode.Open, FileAccess.Read, FileShare.Read, BUFFER_SIZE, FileOptions.SequentialScan ) )
+#if NETSTANDARD || NETCOREAPP
+            using ( var mmf = MemoryMappedFile.CreateFromFile( fs, null, 0L, MemoryMappedFileAccess.Read, HandleInheritability.None, true ) )
+#else
             using ( var mmf = MemoryMappedFile.CreateFromFile( fs, null, 0L, MemoryMappedFileAccess.Read, new MemoryMappedFileSecurity(), HandleInheritability.None, true ) )
+#endif
             using ( var accessor = mmf.CreateViewAccessor( 0L, 0L, MemoryMappedFileAccess.Read ) )
             {
                 byte* buffer = null;
@@ -86,8 +89,8 @@ namespace lingvo.ts
                             var sourceLength = idx;
 
                             var sourceLenInBytes = sourceLength * sizeof(char);
-                            var recordSize   = (sourceLenInBytes + sizeof(char)) + sizeof(double);
-                            var destPtr      = nativeMemAllocator.Alloc( recordSize );
+                            var recordSize       = (sourceLenInBytes + sizeof(char)) + sizeof(double);
+                            var destPtr          = nativeMemAllocator.Alloc( recordSize );
                             Buffer.MemoryCopy( source, (void*) destPtr, sourceLenInBytes, sourceLenInBytes );
                             source += sourceLength;
                             var destination = ((char*) destPtr) + sourceLength;
@@ -182,7 +185,7 @@ namespace lingvo.ts
                     return (true);
                 }
             }
-            probability = default(double);
+            probability = default;
             return (false);
         }
         public bool TryGetProbability( in NativeOffset no, out double probability )
@@ -196,7 +199,7 @@ namespace lingvo.ts
                 probability = ToProbability( existsValue, no.Length + 1 ); //--- len + 1 );
                 return (true);
             }
-            probability = default( double );
+            probability = default;
             return (false);
         }
         #endregion

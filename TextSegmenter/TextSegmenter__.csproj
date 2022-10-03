@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{ECCF795C-AC42-48BF-B78E-EBAC863E2D6A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>lingvo.ts</RootNamespace>
+    <AssemblyName>TextSegmenter</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;XLAT_WHITESPACE_CHARS XLAT_UPPER_INVARIANT_MAP XLAT_CHARTYPE_MAP XLAT_INTERNAL</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE;XLAT_CHARTYPE_MAP    XLAT_UPPER_INVARIANT_MAP     XLAT_WHITESPACE_CHARS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Infrastructure\Extensions.cs" />
+    <Compile Include="TextSegmenter\ITextSegmenter.cs" />
+    <Compile Include="TextSegmenter\Models\IModel.cs" />
+    <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\NativeMemAllocationMediator.cs" />
+    <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\NativeTextMMFModelBinary.cs" />
+    <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\BinaryModelConfig.cs" />
+    <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\Txt2BinModelConverter\Txt2BinModelConverter.cs" />
+    <Compile Include="TextSegmenter\Models\ManagedText\ManagedTextModel.cs" />
+    <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\NativeTextMMF\MMFModelBase.cs" />
+    <Compile Include="TextSegmenter\Models\ManagedText\TextModelConfig.cs" />
+    <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\SetNative\SetNative.cs" />
+    <Compile Include="TextSegmenter\Models\NativeTextMMFBinary\NativeTextMMF\NativeTextMMFModelBase.cs" />
+    <Compile Include="TextSegmenter\UnionTextSegmenter.cs" />
+    <Compile Include="TextSegmenter\TextSegmenter.cs" />
+    <Compile Include="TextSegmenter\ViterbiTextSegmentation.cs" />
+    <Compile Include="Tokenizing\StringsHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tokenizing\[not-builded-but-used]\mld_tokenizer.cs" />
+    <None Include="Tokenizing\[not-builded-but-used]\rld_tokenizer.cs" />
+    <None Include="Tokenizing\[not-builded-but-used]\UrlDetector.cs" />
+    <Compile Include="Tokenizing\xlat.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

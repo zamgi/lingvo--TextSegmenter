@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+using O = System.Runtime.CompilerServices.MethodImplOptions;
+
 namespace lingvo.ts
 {
     /// <summary>
@@ -21,30 +24,30 @@ namespace lingvo.ts
         /// <summary>
         /// 
         /// </summary>
-        public struct InitParam_v1
+        public readonly struct InitParam_v1
         {
-            public LanguageEnum      Language     { get; set; }
-            public BinaryModelConfig ModelConfigs { get; set; }
+            public LanguageEnum      Language     { get; init; }
+            public BinaryModelConfig ModelConfigs { get; init; }
 
             public static InitParam_v1 Create( BinaryModelConfig cfg, LanguageEnum lang ) => new InitParam_v1() { ModelConfigs = cfg, Language = lang };
         }
         /// <summary>
         /// 
         /// </summary>
-        public struct InitParam_v2
+        public readonly struct InitParam_v2
         {
-            public LanguageEnum Language { get; set; }
-            public IModel       Model    { get; set; }
+            public LanguageEnum Language { get; init; }
+            public IModel       Model    { get; init; }
 
             public static InitParam_v2 Create( IModel m, LanguageEnum lang ) => new InitParam_v2() { Model = m, Language = lang };
         }
         /// <summary>
         /// 
         /// </summary>
-        public struct Result
+        public readonly struct Result
         {
-            public LanguageEnum Language { get; private set; }
-            public IReadOnlyList< TermProbability > TPS { get; private set; }
+            public LanguageEnum Language { get; init; }
+            public IReadOnlyList< TermProbability > TPS { get; init; }
 
             public static Result Create( IReadOnlyList< TermProbability > tps, LanguageEnum lang ) => new Result() { TPS = tps, Language = lang };
             public override string ToString() => $"'{Language}', ({string.Join( ", ", TPS )})";
@@ -52,10 +55,10 @@ namespace lingvo.ts
         /// <summary>
         /// 
         /// </summary>
-        public struct Result_Offset
+        public readonly struct Result_Offset
         {
-            public LanguageEnum Language { get; private set; }
-            public IReadOnlyList< TermProbability_Offset > TPS { get; private set; }
+            public LanguageEnum Language { get; init; }
+            public IReadOnlyList< TermProbability_Offset > TPS { get; init; }
 
             public static Result_Offset Create( IReadOnlyList< TermProbability_Offset > tps, LanguageEnum lang ) => new Result_Offset() { TPS = tps, Language = lang };
         }
@@ -319,8 +322,8 @@ namespace lingvo.ts
 
         private int _Lock;
 
-        public bool TryEnter() => (Interlocked.CompareExchange( ref _Lock, OCCUPIED, FREE ) == FREE);
-        public void Enter()
+        [M(O.AggressiveInlining)] public bool TryEnter() => (Interlocked.CompareExchange( ref _Lock, OCCUPIED, FREE ) == FREE);
+        [M(O.AggressiveInlining)] public void Enter()
         {
             if ( Interlocked.CompareExchange( ref _Lock, OCCUPIED, FREE ) != FREE )
             {
@@ -331,7 +334,7 @@ namespace lingvo.ts
                 }
             }
         }
-        public void Exit() => Interlocked.Exchange( ref _Lock, FREE ); //Volatile.Write( ref _Locker, FREE );
+        [M(O.AggressiveInlining)] public void Exit() => Interlocked.Exchange( ref _Lock, FREE ); //Volatile.Write( ref _Locker, FREE );
     }
 
     /// <summary>
@@ -339,6 +342,6 @@ namespace lingvo.ts
     /// </summary>
     internal static class UnionTextSegmenterExtensions
     {
-        public static double N( this double d ) => (double.IsNegativeInfinity( d ) ? double.MinValue : d);
+        [M(O.AggressiveInlining)] public static double N( this double d ) => (double.IsNegativeInfinity( d ) ? double.MinValue : d);
     }
 }
