@@ -29,12 +29,8 @@ $(document).ready(function () {
             'азатемоформилвсёэтоввидебиблиотекинаC++соswigбиндингамидлядругихязыковазатемоформилвсёэтоввидебиблиотекинаC++соswigбиндингамидлядругихязыковазатемоформилвсёэтоввидебиблиотекинаC++соswigбиндингамидлядругихязыковазатемоформилвсёэтоввидебиблиотекинаC++соswigбиндингамидлядругихязыков';
 
     var textOnChange = function () {
-        var _len = $('#text').val().length; 
-        var len = _len.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-        var $textLength = $('#textLength');
-        $textLength.html('length of text: ' + len + ' characters');
-        if (MAX_INPUTTEXT_LENGTH < _len) $textLength.addClass('max-inputtext-length');
-        else                             $textLength.removeClass('max-inputtext-length');
+        let len = $('#text').val().length, len_txt = len.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        $('#textLength').toggleClass('max-inputtext-length', MAX_INPUTTEXT_LENGTH < len).html('length of text: ' + len_txt + ' characters');
     };
     var getText = function( $text ) {
         var text = trim_text( $text.val().toString() );
@@ -68,7 +64,7 @@ $(document).ready(function () {
     })();
     $('#resetText2Default').click(function () {
         $('#text').val('');
-        setTimeout(function () { $('#text').val(DEFAULT_TEXT).focus(); }, 100);
+        setTimeout(() => $('#text').val(DEFAULT_TEXT).focus(), 100);
     });
 
     $('#processButton').click(function () {
