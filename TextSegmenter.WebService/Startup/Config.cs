@@ -25,17 +25,17 @@ namespace lingvo.ts.webService
     {
         public Config()
         {
-            MAX_INPUTTEXT_LENGTH = int.Parse( ConfigurationManager.AppSettings[ "MAX_INPUTTEXT_LENGTH" ] );
+            MAX_INPUTTEXT_LENGTH              = int.Parse( ConfigurationManager.AppSettings[ "MAX_INPUTTEXT_LENGTH" ] );
             CONCURRENT_FACTORY_INSTANCE_COUNT = int.Parse( ConfigurationManager.AppSettings[ "CONCURRENT_FACTORY_INSTANCE_COUNT" ] );
 
             _RU_MODEL_DICTIONARY_CAPACITY = Get_MODEL_DICTIONARY_CAPACITY( "RU" );
-            _RU_BINARY_MODEL_FILENAMES = Get_BINARY_MODEL_FILENAMES( "RU" );
+            _RU_BINARY_MODEL_FILENAMES    = Get_BINARY_MODEL_FILENAMES( "RU" );
 
             _EN_MODEL_DICTIONARY_CAPACITY = Get_MODEL_DICTIONARY_CAPACITY( "EN" );
-            _EN_BINARY_MODEL_FILENAMES = Get_BINARY_MODEL_FILENAMES( "EN" );
+            _EN_BINARY_MODEL_FILENAMES    = Get_BINARY_MODEL_FILENAMES( "EN" );
 
             _DE_MODEL_DICTIONARY_CAPACITY = Get_MODEL_DICTIONARY_CAPACITY( "DE" );
-            _DE_BINARY_MODEL_FILENAMES = Get_BINARY_MODEL_FILENAMES( "DE" );
+            _DE_BINARY_MODEL_FILENAMES    = Get_BINARY_MODEL_FILENAMES( "DE" );
         }
 
         private int Get_MODEL_DICTIONARY_CAPACITY( string lang ) => int.Parse( ConfigurationManager.AppSettings[ lang + "_MODEL_DICTIONARY_CAPACITY" ] );
